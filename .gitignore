@@ -1,0 +1,27 @@
+# secrets
+.env
+*.env
+
+# licensed WRDS data and anything derived from it per-event (CRSP, ExecuComp, I/B/E/S, Thomson, Capital IQ)
+gg_cache/
+outputs/data/
+outputs/rag/
+outputs/logs/
+outputs/results/report.md
+outputs/results/car_paths.png
+
+# validation: scripts are tracked; the data/text files are not (Capital IQ announcement text, annotator labels)
+validation/*.csv
+validation/*.jsonl
+validation/tasks/
+validation/labels_raw/
+validation/cand_tasks/
+validation/cand_labels_raw/
+
+# misc
+__pycache__/
+*.pyc
+*.pkl
+*.npy
+*.pdf
+.ipynb_checkpoints/

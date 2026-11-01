@@ -76,6 +76,8 @@ outputs/                   everything the code writes (regenerable)
   results/                 stage*_results.json, study_results.json, report.md, car_paths.png        (feed the memo and notebook)
   rag/                     legacy semantic-search index (`guide_and_go.py search`)
   logs/                    run logs
+pyproject.toml, uv.lock    the environment: dependencies and exact locked versions (Python 3.11)
+scripts/setup_env.sh|.ps1  one-command environment setup with uv
 .env                       WRDS credentials (never commit or share)
 ```
 
@@ -85,8 +87,22 @@ outputs/                   everything the code writes (regenerable)
 
 ## Reproduce
 
-Run everything **from the repo root**. Python 3.11; packages: `pandas numpy scipy statsmodels scikit-learn matplotlib requests sqlalchemy psycopg2-binary python-dotenv nbformat`
-(`sentence-transformers` and `anthropic` only for the legacy RAG search). Put `WRDS_USERNAME` and `WRDS_PASSWORD` in `.env` (Postgres, preferred) or `WRDS_API_KEY`.
+### Setup (one command, using [uv](https://docs.astral.sh/uv/))
+
+```
+# once: install uv       winget install --id=astral-sh.uv -e   |   brew install uv   |   pipx install uv
+git clone https://github.com/Nayrbnat/guidance-reversal && cd guidance-reversal
+scripts/setup_env.sh                  # macOS / Linux / Git Bash.   Windows PowerShell: scripts\setup_env.ps1
+uv run python tests/test_gg.py        # sanity check: unit tests + simulations, no data or WRDS access needed
+```
+
+This builds `.venv` from the committed `uv.lock`, so everyone gets identical package versions (Python 3.11 is downloaded automatically if you don't have it).
+Add `--rag` (`-Rag` on PowerShell) for the legacy semantic-search extras (`sentence-transformers`, `anthropic`). The environment is defined in `pyproject.toml`.
+
+### Run the pipeline
+
+Run everything **from the repo root**, prefixing each command with `uv run` (or activate `.venv`). The pipeline needs your own WRDS access:
+put `WRDS_USERNAME` and `WRDS_PASSWORD` in `.env` (Postgres, preferred) or `WRDS_API_KEY`.
 
 ```
 python src/guide_and_go.py build --start 2004 --end 2025        # data + features (~15 min with a warm gg_cache)

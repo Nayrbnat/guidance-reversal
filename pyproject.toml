@@ -1,0 +1,35 @@
+[project]
+name = "guidance-reversal"
+version = "0.1.0"
+description = "Pre-registered test of whether executives who guide, sell and leave leave behind underperforming firms"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "numpy>=2.4",
+    "pandas>=3.0",
+    "scipy>=1.17",
+    "statsmodels>=0.15",
+    "patsy>=1.0",
+    "scikit-learn>=1.9",
+    "matplotlib>=3.10",
+    "requests>=2.32",
+    "sqlalchemy>=2.0",
+    "psycopg2-binary>=2.9",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+# regenerate and execute the results notebook (notebooks/make_nb.py)
+notebook = [
+    "nbformat>=5.10",
+    "nbconvert>=7.16",
+    "ipykernel>=6.29",
+]
+# legacy semantic-search layer only (guide_and_go.py search); not used for any inference
+rag = [
+    "sentence-transformers>=3.0",
+    "anthropic>=0.40",
+]
+
+[tool.uv]
+package = false          # scripts, not an installable package: `uv sync` builds the environment only

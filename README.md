@@ -69,7 +69,6 @@ validation/                hand-labelled evidence that the measurement works
   cand_tasks/, cand_labels_raw/       two-pass reads of every flagged candidate event
   candidate_labels.csv                merged labels consumed by src/gg_study.py
   make_*.py, merge_candidates.py, build_gold.py, evaluate.py   build the sets and score the classifier
-  dbg.py, errors.py                   debugging helpers
 gg_cache/                  raw WRDS pulls (several GB; regenerable, versioned `*_v2*`; not source)
 outputs/                   everything the code writes (regenerable)
   data/                    events.csv, screen.csv, panel_*.pkl, study_windows.pkl, car_paths.pkl   (inputs to the tests)

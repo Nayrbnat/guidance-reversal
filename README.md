@@ -7,29 +7,106 @@ detect an alpha of about -20% a year, but not -5% to -10%. Full results and how 
 **The idea tested.** A CEO/CFO issues EPS guidance, sells stock after it, then leaves abruptly before the guidance comes due; the firm then underperforms.
 We call a firm where all three hold a *Guidance Reversal*. Universe: S&P 1500 CEO/CFO departures announced 2004-2025 (WRDS: ExecuComp, CRSP, I/B/E/S, Thomson Form 4, Capital IQ).
 
+## Requirements: dependencies and credentials (read first)
+
+You can run the unit tests with no accounts. **Rebuilding the data and results needs paid WRDS data access.**
+
+| Need | What | Where it is used |
+|---|---|---|
+| **WRDS account** (Wharton Research Data Services) | Subscriptions to **ExecuComp** (`comp_execucomp`), **CRSP** (daily stock file, delisting, names), **I/B/E/S** (guidance and actuals), **Thomson Reuters insider filings** (Form 4, schema `tfn`), **Capital IQ** key developments, and the **Fama-French factors** | All pulls in `src/guide_and_go.py` and `src/gg_tests.py` |
+| **WRDS credentials** in a `.env` file at the repo root | `WRDS_USERNAME` and `WRDS_PASSWORD` for the **Postgres** connection (preferred), or `WRDS_API_KEY` for the REST API | Never commit `.env`. The REST API **silently truncates large pulls**, so use Postgres for the real run |
+| **Python 3.11** (3.11 to 3.12) and [`uv`](https://docs.astral.sh/uv/) | Locked environment in `pyproject.toml` and `uv.lock` | `scripts/setup_env.sh` or `scripts/setup_env.ps1` |
+| **Core libraries** | `numpy`, `pandas`, `scipy`, `statsmodels`, `patsy`, `scikit-learn`, `matplotlib`, `requests`, `sqlalchemy`, `psycopg2-binary`, `python-dotenv` | Installed by the setup script |
+| Optional: notebook | `nbformat`, `nbconvert`, `ipykernel` | Regenerate and run `notebooks/guide_and_go_analysis.ipynb` |
+| Optional: legacy search | `sentence-transformers`, `anthropic` | Only the old semantic-search layer; **not used for any result** |
+| **Annotators** (people or models, blind to returns) | The abrupt-exit labels for candidate events | The annotation step in the pipeline; the annotator files are not in this repository, so you need your own annotation pass to reproduce the flag |
+
+No other API key is needed for the results in this repository. The WRDS data is licensed and cannot be redistributed (see the note below the file reference).
+
 ## How the project is built, at a glance
 
+Legend: solid arrow = synchronous call or read; **dashed arrow = asynchronous, offline handoff** (a person or model works on files and returns later); cylinder = data store; hexagon = external actor.
+There is no web service, message queue or server database here. It is a batch pipeline: WRDS is the only external API, the data stores are files, and the only asynchronous part is the annotation loop.
+
+```mermaid
+flowchart LR
+    subgraph EXT["External systems"]
+        WRDS[("WRDS Postgres<br/>ExecuComp, CRSP, I/B/E/S,<br/>Thomson Form 4, Capital IQ,<br/>Fama-French")]
+        ANN{{"Annotators<br/>blind to returns"}}
+    end
+
+    subgraph PIPE["Pipeline: Python batch jobs, run from the repo root"]
+        BUILD["guide_and_go.py build<br/>loaders, features, event study"]
+        LAB["gg_labels.py<br/>name matching, exit-text classifier"]
+        S12["Stages 1 and 2<br/>gg_study, gg_variants, gg_tests<br/>calendar-time alpha, placebo, Holm"]
+        S3["Stage 3<br/>gg_panel_data, gg_stage3, gg_econ<br/>fixed-effects panel, clustered SEs"]
+        S4["Stage 4<br/>gg_stage4<br/>explore 2004-14, confirm 2015-25"]
+    end
+
+    subgraph STORE["Data stores: files, regenerable"]
+        CACHE[("gg_cache/<br/>pickled WRDS pulls, v2-versioned")]
+        EVENTS[("outputs/data/<br/>events.csv, panels, windows")]
+        GOLD[("validation/<br/>gold set, candidate_labels.csv")]
+        RES[("outputs/results/<br/>stage results, JSON")]
+    end
+
+    OUT["Notebook and MEMO.md<br/>results and how far to trust them"]
+
+    WRDS -->|"SQL, psycopg2, chunked reads"| BUILD
+    BUILD -->|"write pickles"| CACHE
+    CACHE -->|"read on re-run"| BUILD
+    BUILD --> LAB
+    LAB --> BUILD
+    BUILD -->|"write events"| EVENTS
+    EVENTS -.->|"annotation tasks, JSONL files"| ANN
+    ANN -.->|"labels, JSONL files"| GOLD
+    GOLD -->|"candidate_labels.csv"| S12
+    EVENTS --> S12
+    EVENTS --> S3
+    EVENTS --> S4
+    CACHE -->|"CRSP, factors"| S12
+    CACHE --> S3
+    CACHE --> S4
+    S12 -->|"write"| RES
+    S3 -->|"write"| RES
+    S4 -->|"write"| RES
+    RES --> OUT
 ```
- WRDS (Postgres)                                         hand labels (280 gold + candidate events)
-      |                                                              |
-      v                                                              v
- gg_cache/  raw pulls  --->  src/guide_and_go.py  build  --->  outputs/data/events.csv  (one row per departure + flags)
-                             src/gg_labels.py   (names, insider matching, "abrupt exit" text classifier)   ^
-                                      |                                                    validation/ (gold set, annotator
-                                      v                                                    tasks, classifier evaluation)
-        +-----------------------------+------------------------------+
-        v                             v                              v
-  STAGE 1 + 2                    STAGE 3                         STAGE 4
-  calendar-time alpha            stayers as controls             exploratory + hold-out
-  src/gg_study.py                src/gg_panel_data.py            src/gg_stage4.py
-  src/gg_variants.py             src/gg_stage3.py (P1-P3)        (explore 2004-14, confirm 2015-25)
-  src/gg_tests.py                src/gg_stage3_calibrate.py
-  (factor alpha, placebo, Holm)  src/gg_econ.py (FE OLS, 2-way clustered SEs)
-        |                             |                              |
-        +-----------------------------+------------------------------+
-                                      v
-                         outputs/results/*.json  --->  notebooks/guide_and_go_analysis.ipynb  +  MEMO.md
+
+One end-to-end run, with the synchronous database calls and the asynchronous annotation loop:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor R as Researcher (CLI)
+    participant B as guide_and_go build
+    participant C as gg_cache (pickles)
+    participant W as WRDS Postgres
+    participant V as validation scripts
+    participant A as Annotators (blind to returns)
+    participant S as gg_study and later stages
+
+    R->>B: python src/guide_and_go.py build
+    B->>C: look up pull (v2 key)
+    alt cache miss
+        B->>W: SQL query, chunked
+        W-->>B: rows
+        B->>C: write pickle
+    end
+    B-->>R: outputs/data/events.csv
+
+    R->>V: make_candidate_tasks pass1
+    V-)A: task files (JSONL), async handoff
+    Note over A: label each exit as abrupt or planned
+    A--)V: answers (JSONL), returned later
+    R->>V: pass2 on exits called abrupt, then merge_candidates
+    V-->>R: candidate_labels.csv
+
+    R->>S: python src/gg_study.py
+    S->>C: read CRSP and factors
+    S-->>R: outputs/results/study_results.json
 ```
+
 
 | Stage | Question | Method | Verdict |
 |---|---|---|---|

@@ -1,0 +1,13 @@
+{
+ "config_hash": "72fb2dc9d4c9cd3073272aeeacfe411df0dc10c9d07411e8a05ca776096e935c",
+ "cut_rule": "p33_p67_v2",
+ "model": "claude-haiku-5-5",
+ "rubric_version": "r3",
+ "rubric_sha256": "51ac310b1f7818cdf569d6f5b811ec4e492550df0ad498fbe2393dcbec08bd88",
+ "extraction_version": "ex8",
+ "cli_version": "2.1.252 (Claude Code)",
+ "prompt_hashes": [
+  "9c734b4a1c738cdb45c0599fc74e6e285b7e88ac0bd51ceae40bacce621da974",
+  "f6fdc3cef0020dabb3a736417e6621329304f44c23685701d8cc88d81d05649e"
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "passed": true,
+ "tests_enabled": [
+  "T1",
+  "T2",
+  "T3",
+  "T4"
+ ],
+ "failures": [],
+ "metrics": {
+  "kappa_reads": 0.942957060138737,
+  "within_one": 1.0,
+  "kappa_audit": 0.7724543328487457,
+  "max_adjacent_share": 0.5728643216080402
+ },
+ "thresholds": {
+  "kappa_reads": 0.7,
+  "within_one": 0.9,
+  "kappa_audit": 0.6,
+  "max_adjacent_share": 0.8
+ },
+ "viability": null,
+ "viability_deferred": true,
+ "viability_failures": [],
+ "cut_rule": "p33_p67_v2",
+ "config_hash": "72fb2dc9d4c9cd3073272aeeacfe411df0dc10c9d07411e8a05ca776096e935c",
+ "audit_ci95_kappa": [
+  0.6723860686658398,
+  0.8505699624312101
+ ],
+ "limitation": "Model scores above the hand audit in 42 of 100 rows (mean +0.5; 26 fives vs 10): it credits percentage changes in price and units, and customer counts, as price x quantity. Rubric r3 kept; groups use relative cut points."
+}

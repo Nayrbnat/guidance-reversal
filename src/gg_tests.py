@@ -243,3 +243,48 @@ def split_permutation(windows: dict, ids, flags, years, fac, T, factors=FACTORS_
             f[g] = rng.permutation(flags[g])
         null[r] = stat(f)[0]
     return obs, a_true, a_false, null
+
+
+# --------------------------------------------------------------------------------------
+# Stage 5 helpers: placebo contrast between two groups
+# --------------------------------------------------------------------------------------
+def placebo_draws(windows: dict, flagged: pd.DataFrame, pool: pd.DataFrame, fac: pd.DataFrame, H: int, *,
+                  strata_col="year", id_col="event_id", reps=1000, seed=0, factors=FACTORS_FF4) -> np.ndarray:
+    """Alphas of random same-size portfolios drawn from `pool` (non-flagged events), matching the flagged set's count
+    per `strata_col`. `H` is the calendar length (the `T` argument of portfolio)."""
+    rng = np.random.default_rng(seed)
+    need = flagged.groupby(strata_col).size()
+    cand = pool[pool[id_col].isin(windows.keys())]
+    by_s = {s: g[id_col].values for s, g in cand.groupby(strata_col)}
+    out = np.empty(reps)
+    for r in range(reps):
+        pick = []
+        for s, k in need.items():
+            arr = by_s.get(s)
+            if arr is None or len(arr) == 0:
+                continue
+            pick.extend(rng.choice(arr, size=min(k, len(arr)), replace=False))
+        port, cnt = portfolio(windows, pick, H)
+        out[r] = alpha_fast(port, cnt, fac, factors)
+    return out
+
+
+def fpc_factor(n_flagged: int, n_pool: int) -> float:
+    """Standard-deviation inflation for a placebo null drawn from a finite pool. A placebo portfolio varies only around the
+    pool's own mean, while a flagged portfolio also carries the pool's sampling error, so the draws understate the spread
+    of (flagged - pool mean) by sqrt((N + n) / (N - n)). Negligible for large pools (the earlier stages), up to 1.22 when
+    the pool is only 5x the flagged count."""
+    return float(np.sqrt((n_pool + n_flagged) / (n_pool - n_flagged))) if n_pool > n_flagged > 0 else float("nan")
+
+
+def placebo_difference(windows, flagged_low, flagged_high, pool_low, pool_high, fac, H, *, reps=1000, seed=0,
+                       strata_col="year", id_col="event_id", factors=FACTORS_FF4) -> np.ndarray:
+    """Null for 'the excess alpha of flagged firms is the same in the low and the high group'. Each replication draws a
+    same-size, per-stratum-matched portfolio from each group's own non-flagged pool; the statistic is the draw alpha
+    minus that group's mean placebo alpha (scaled by fpc_factor), low minus high. Centring removes baseline alpha
+    differences between groups and any common shift, so it is the null of EQUAL effects, not of two zero effects."""
+    a_lo = placebo_draws(windows, flagged_low, pool_low, fac, H, strata_col=strata_col, id_col=id_col, reps=reps, seed=seed, factors=factors)
+    a_hi = placebo_draws(windows, flagged_high, pool_high, fac, H, strata_col=strata_col, id_col=id_col, reps=reps, seed=seed + 1, factors=factors)
+    f_lo = fpc_factor(len(flagged_low), int(pool_low[id_col].isin(windows.keys()).sum()))
+    f_hi = fpc_factor(len(flagged_high), int(pool_high[id_col].isin(windows.keys()).sum()))
+    return f_lo * (a_lo - np.nanmean(a_lo)) - f_hi * (a_hi - np.nanmean(a_hi))

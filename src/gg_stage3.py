@@ -134,8 +134,10 @@ P2_CTRL = ["lmcap", "ret12", "ldays", "qtr", "ltenure", "age"]
 P1_CTRL = ["sale12", "lmcap", "ret12", "ltenure", "age"]
 
 
-def run_p2(B: pd.DataFrame, *, y="miss", opt="opt_pos", sale="sale", exit_="exit_in", cluster2="tq", rng=None, dry=False,
-           optz=False) -> dict:
+def p2_frame(B: pd.DataFrame, *, y="miss", opt="opt_pos", sale="sale", exit_="exit_in", rng=None, dry=False,
+             optz=False) -> pd.DataFrame:
+    """The P2 regression frame: outcome y (x100, winsorised), terms O S X and their products, controls ldays and qtr.
+    Shared by run_p2 and the Stage 5 extension (gg_stage5.run_p2_T)."""
     d = B.copy()
     d["y"] = wins(d[y].dropna() * 100).reindex(d.index)
     if dry:   # randomise the outcome within year-quarter; treatment structure untouched
@@ -148,6 +150,12 @@ def run_p2(B: pd.DataFrame, *, y="miss", opt="opt_pos", sale="sale", exit_="exit
     d["S"], d["X"] = d[sale].astype(float), d[exit_].astype(float)
     d["OS"], d["OX"], d["SX"], d["OSX"] = d.O * d.S, d.O * d.X, d.S * d.X, d.O * d.S * d.X
     d["ldays"], d["qtr"] = np.log(d.days_to_p.clip(lower=1)), (d.pdicity == "QTR").astype(float)
+    return d
+
+
+def run_p2(B: pd.DataFrame, *, y="miss", opt="opt_pos", sale="sale", exit_="exit_in", cluster2="tq", rng=None, dry=False,
+           optz=False) -> dict:
+    d = p2_frame(B, y=y, opt=opt, sale=sale, exit_=exit_, rng=rng, dry=dry, optz=optz)
     xs = ["O", "S", "X", "OS", "OX", "SX", "OSX"] + P2_CTRL
     n0 = len(d)
     res = E.fe_ols(d, "y", xs, firm="gvkey", year="tq", cluster="gvkey", cluster2=cluster2)
@@ -157,7 +165,9 @@ def run_p2(B: pd.DataFrame, *, y="miss", opt="opt_pos", sale="sale", exit_="exit
     return s
 
 
-def run_p1(Q: pd.DataFrame, *, opt="opt_pos", sale="salepost", cluster2="tq", rng=None, dry=False, optz=False, logit=False) -> dict:
+def p1_frame(Q: pd.DataFrame, *, opt="opt_pos", sale="salepost", rng=None, dry=False, optz=False) -> pd.DataFrame:
+    """The P1 regression frame: outcome y (exit x100), terms O S OS and the sale12 control. Shared by run_p1 and the
+    Stage 5 extension (gg_stage5.run_p1_T)."""
     d = Q.copy()
     d["y"] = d.exit * 100.0
     if dry:
@@ -170,6 +180,11 @@ def run_p1(Q: pd.DataFrame, *, opt="opt_pos", sale="salepost", cluster2="tq", rn
     d["S"] = d[sale].astype(float)
     d["OS"] = d.O * d.S
     d["sale12"] = d.sale12.astype(float)
+    return d
+
+
+def run_p1(Q: pd.DataFrame, *, opt="opt_pos", sale="salepost", cluster2="tq", rng=None, dry=False, optz=False, logit=False) -> dict:
+    d = p1_frame(Q, opt=opt, sale=sale, rng=rng, dry=dry, optz=optz)
     xs = ["O", "S", "OS"] + P1_CTRL
     if logit:
         d["yb"] = (d.y > 0).astype(float)
@@ -210,6 +225,23 @@ def audit(Q, B, sales, g) -> dict:
     return out
 
 
+def build_panels(Q0, g, ep, sales, tab, age_tab, si, si1m):
+    """Panel A (CEO-quarters) and Panel B (guidance releases with an actual) with their controls, exactly as gg_stage3.main
+    built them inline. Returns (Q, B, b_all); b_all keeps the releases without an actual, for the attrition audit."""
+    b_all = release_frame(g, ep, si, si1m)
+    B = b_all[b_all.has_actual].reset_index(drop=True)
+    B = add_exec_controls(add_market_controls(B, tab, "t"), ep, age_tab, "t")
+    B["gvkey"] = B.gvkey.astype(str)
+    Q = Q0.copy()
+    Q["permno"] = Q.permno.astype("int64"); Q["tq"] = Q.qs.dt.to_period("Q").astype(str)
+    Q["opt_pos"] = (Q.opt > 0).astype(float)
+    Q["reason"] = ep.set_index("ep_id").reason.reindex(Q.ep_id).values
+    Q["salepost_r13"] = si.any_in(Q.ep_id.values, Q.gdate.values, (Q.qs - pd.Timedelta(days=90)).values)
+    Q = add_exec_controls(add_market_controls(Q, tab, "qs"), ep, age_tab, "qs")
+    Q["gvkey"] = Q.gvkey.astype(str)
+    return Q, B, b_all
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--reps", type=int, default=5000)
@@ -232,24 +264,11 @@ def main():
     res = {"dry_run": dry, "min_sizes": MIN}
     print("DRY RUN: outcomes are randomised; only mechanics are shown." if dry else "REGISTERED RUN")
 
-    # ------------------------------------------------------------ Panel B
-    b_all = release_frame(g, ep, si, si1m)
+    Q, B, b_all = build_panels(Q, g, ep, sales, tab, age_tab, si, si1m)
     att = b_all.groupby("exit_in").has_actual.agg(["mean", "size"])
     res["attrition_A18"] = {"share_with_actual_exit0": float(att.loc[False, "mean"]), "share_with_actual_exit1": float(att.loc[True, "mean"]),
                             "n_exit0": int(att.loc[False, "size"]), "n_exit1": int(att.loc[True, "size"])}
-    B = b_all[b_all.has_actual].reset_index(drop=True)
-    B = add_exec_controls(add_market_controls(B, tab, "t"), ep, age_tab, "t")
-    B["gvkey"] = B.gvkey.astype(str)
     print(f"Panel B: releases {len(B):,} (attrition: share with an actual {res['attrition_A18']['share_with_actual_exit0']:.1%} if no exit vs {res['attrition_A18']['share_with_actual_exit1']:.1%} if exit)")
-
-    # ------------------------------------------------------------ Panel A
-    Q = Q.copy()
-    Q["permno"] = Q.permno.astype("int64"); Q["tq"] = Q.qs.dt.to_period("Q").astype(str)
-    Q["opt_pos"] = (Q.opt > 0).astype(float)
-    Q["reason"] = ep.set_index("ep_id").reason.reindex(Q.ep_id).values
-    Q["salepost_r13"] = si.any_in(Q.ep_id.values, Q.gdate.values, (Q.qs - pd.Timedelta(days=90)).values)
-    Q = add_exec_controls(add_market_controls(Q, tab, "qs"), ep, age_tab, "qs")
-    Q["gvkey"] = Q.gvkey.astype(str)
     print(f"Panel A: CEO-quarters {len(Q):,}, exits {int(Q.exit.sum()):,}")
     res["audit"] = audit(Q.assign(salepost=Q.salepost.astype(bool)), B.assign(sale=B.sale.astype(bool)), sales, g)
     print("look-ahead audit:", res["audit"])
@@ -321,11 +340,15 @@ def main():
     print("wrote", RESULTS / name)
 
 
-def run_p3(db, Q, crsp, mkt, reps, dry, rng) -> dict:
+def build_p3_events(db, Q, crsp, mkt):
+    """The P3 event frame: stayers (Amendment 1 rule) and leavers (Stage-2 L1 x U2 events) with their 252-day windows.
+    Returns (ev_all, windows, factors, H) where H is the calendar length (the return horizon `T` of gg_tests.portfolio;
+    renamed here so it cannot be confused with the Stage 5 transparency score). Extracted unchanged from run_p3; ev_all
+    additionally carries gvkey and ann_quarter so that T can be attached and clustered on (Stage 5)."""
     fac_all = GT.load_factors(db)
     cal = np.sort(mkt.date.values.astype("datetime64[ns]"))
     cal = cal[np.isin(cal, fac_all.index.values)]
-    fac = fac_all.reindex(pd.DatetimeIndex(cal)); T_ = len(cal)
+    fac = fac_all.reindex(pd.DatetimeIndex(cal)); H = len(cal)
     # stayers (Amendment 1 rule)
     st = PD.select_stayers(Q.assign(salepost=Q.salepost.astype(bool)))
     st = st.assign(event_id=[f"S{e}_{d:%Y%m%d}" for e, d in zip(st.ep_id, st.qs)], d=st.qs, year=st.qs.dt.year, leaver=False)
@@ -334,14 +357,22 @@ def run_p3(db, Q, crsp, mkt, reps, dry, rng) -> dict:
     L = GV.link_masks(ev)
     lv = ev[ev.elig & L["L1"] & ev.role_last.isin(["CEO", "CFO"]) & (ev.dep_ann_final <= pd.Timestamp("2024-12-31"))].copy()
     lv = lv.assign(d=lv.dep_ann_final, year=lv.dep_ann_final.dt.year, leaver=True)
-    ev_all = pd.concat([st[["event_id", "permno", "d", "year", "leaver", "days_since_guid"]],
-                        lv[["event_id", "permno", "d", "year", "leaver", "days_since_guid"]]], ignore_index=True)
+    cols = ["event_id", "permno", "d", "year", "leaver", "days_since_guid", "gvkey"]
+    ev_all = pd.concat([st[cols], lv[cols]], ignore_index=True)
     ev_all["permno"] = ev_all.permno.astype(int)
+    ev_all["gvkey"] = ev_all.gvkey.astype(str).str.zfill(6)
+    ev_all["ann_quarter"] = ev_all.d.dt.to_period("Q").astype(str)
     win = GT.build_windows(ev_all, crsp, cal, date_col="d", skip=2, horizon=252)
     ev_all = ev_all[ev_all.event_id.isin(win.keys())].reset_index(drop=True)
+    ev_all.attrs["n_stayer_execs"] = int(st.ep_id.nunique())      # counted before the window filter, as run_p3 always did
+    return ev_all, win, fac, H
+
+
+def run_p3(db, Q, crsp, mkt, reps, dry, rng) -> dict:
+    ev_all, win, fac, T_ = build_p3_events(db, Q, crsp, mkt)
     flags = ev_all.leaver.values
     n1, n0 = int(flags.sum()), int((~flags).sum())
-    r = {"n_leavers": n1, "n_stayers": n0, "n_stayer_execs": int(st.ep_id.nunique()),
+    r = {"n_leavers": n1, "n_stayers": n0, "n_stayer_execs": int(ev_all.attrs["n_stayer_execs"]),
          "days_since_guid_median_leavers": float(ev_all.loc[flags, "days_since_guid"].median()),
          "days_since_guid_median_stayers": float(ev_all.loc[~flags, "days_since_guid"].median()),
          "eligible": bool(n1 >= MIN["P3_each"] and n0 >= MIN["P3_each"])}

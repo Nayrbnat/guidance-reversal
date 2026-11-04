@@ -19,6 +19,7 @@ You can run the unit tests with no accounts. **Rebuilding the data and results n
 | **Core libraries** | `numpy`, `pandas`, `scipy`, `statsmodels`, `patsy`, `scikit-learn`, `matplotlib`, `requests`, `sqlalchemy`, `psycopg2-binary`, `python-dotenv` | Installed by the setup script |
 | Optional: notebook | `nbformat`, `nbconvert`, `ipykernel` | Regenerate and run `notebooks/guide_and_go_analysis.ipynb` |
 | Optional: legacy search | `sentence-transformers`, `anthropic` | Only the old semantic-search layer; **not used for any result** |
+| Stage 5 only (exploratory) | The **WRDS SEC filings index** (`wrdssec`) to find each firm's 10-Ks, an SEC contact address in the `SEC_CONTACT_EMAIL` environment variable for filing downloads, the optional `stage5` extras (`uv sync --extra stage5`), and the **Claude Code CLI** logged in (the transparency scorer calls `claude -p` with a Claude Haiku model; no API key is stored) | `src/gg_filings.py`, `src/gg_transparency.py`, `src/gg_stage5.py` |
 | **Annotators** (people or models, blind to returns) | The abrupt-exit labels for candidate events | The annotation step in the pipeline; the annotator files are not in this repository, so you need your own annotation pass to reproduce the flag |
 
 No other API key is needed for the results in this repository. The WRDS data is licensed and cannot be redistributed (see the note below the file reference).
@@ -33,6 +34,7 @@ flowchart LR
     subgraph EXT["External systems"]
         WRDS[("WRDS Postgres<br/>ExecuComp, CRSP, I/B/E/S,<br/>Thomson Form 4, Capital IQ,<br/>Fama-French")]
         ANN{{"Annotators<br/>blind to returns"}}
+        LLM{{"Claude Code CLI<br/>Haiku, Stage 5 scoring"}}
     end
 
     subgraph PIPE["Pipeline: Python batch jobs, run from the repo root"]
@@ -41,6 +43,7 @@ flowchart LR
         S12["Stages 1 and 2<br/>gg_study, gg_variants, gg_tests<br/>calendar-time alpha, placebo, Holm"]
         S3["Stage 3<br/>gg_panel_data, gg_stage3, gg_econ<br/>fixed-effects panel, clustered SEs"]
         S4["Stage 4<br/>gg_stage4<br/>explore 2004-14, confirm 2015-25"]
+        S5["Stage 5, exploratory<br/>gg_filings, gg_phases, gg_transparency, gg_stage5<br/>10-K transparency score, tests T1-T4"]
     end
 
     subgraph STORE["Data stores: files, regenerable"]
@@ -69,6 +72,10 @@ flowchart LR
     CACHE --> S4
     S12 -->|"write"| RES
     S3 -->|"write"| RES
+    WRDS -->|"SQL, SEC filings index"| S5
+    S5 -->|"subprocess call, claude -p"| LLM
+    LLM -->|"JSON scores"| S5
+    S5 -->|"write"| RES
     S4 -->|"write"| RES
     RES --> OUT
 ```
@@ -114,6 +121,7 @@ sequenceDiagram
 | 2 | Same, with abruptness dropped and intent proxied by optimistic guidance | Wider links (L1-L4), optimism split, Holm over 14 tests | Null (one borderline test, not treated as a finding) |
 | 3 | Do guide-sell-leave firms differ from guide-sell-**stay** firms? | CEO-quarter panel, firm and year-quarter fixed effects, two-way clustered SEs, null-calibrated | Null on P1, P2, P3 |
 | 4 | Is there anything in the pattern at all? | Exploration on 2004-2014, selection rule fixed, confirmation on 2015-2025 | Nothing robust; CEO exits not preceded by a sale follow earnings misses |
+| 5 | Is the pattern stronger where segment reporting is opaque? (exploratory; see `docs/STAGE5_SPEC.md`) | A language model scores each 10-K's transparency (0 to 5, blind to returns); reliability gate against a hand audit; four tests of low versus high transparency (T1-T4) | Null: H5 not supported, all four Holm-adjusted p = 1.0 |
 
 ## Repository map
 
@@ -174,6 +182,8 @@ uv run python tests/test_gg.py        # sanity check: unit tests + simulations, 
 
 This builds `.venv` from the committed `uv.lock`, so everyone gets identical package versions (Python 3.11 is downloaded automatically if you don't have it).
 Add `--rag` (`-Rag` on PowerShell) for the legacy semantic-search extras (`sentence-transformers`, `anthropic`). The environment is defined in `pyproject.toml`.
+
+Set the environment variable `GG_ROOT` to an absolute path to make the code read and write its data tree (`gg_cache/`, `outputs/`) somewhere other than the repo root.
 
 ### Run the pipeline
 

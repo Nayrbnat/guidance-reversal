@@ -26,7 +26,7 @@ No other API key is needed for the results in this repository. The WRDS data is 
 ## How the project is built, at a glance
 
 Legend: solid arrow = synchronous call or read; **dashed arrow = asynchronous, offline handoff** (a person or model works on files and returns later); cylinder = data store; hexagon = external actor.
-There is no web service, message queue or server database here. It is a batch pipeline: WRDS is the only external API, the data stores are files, and the only asynchronous part is the annotation loop.
+This codebase operates as a batch pipeline: WRDS is the only external API, the data stores are files, and the only asynchronous part is the annotation loop.
 
 ```mermaid
 flowchart LR

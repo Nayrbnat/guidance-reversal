@@ -26,3 +26,8 @@ __pycache__/
 *.pdf
 .ipynb_checkpoints/
 .venv/
+
+# Stage 5: per-firm scores, filing text and the motivating firm never leave the local data tree
+validation/transp_*
+outputs/data/stage5_*
+gg_cache/filings_text/

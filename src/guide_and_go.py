@@ -92,7 +92,7 @@ warnings.filterwarnings("ignore")
 pd.set_option("display.width", 200)
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parent                      # repo root (this file lives in src/)
+ROOT = Path(os.environ["GG_ROOT"]) if os.environ.get("GG_ROOT") else HERE.parent   # repo root (this file lives in src/); GG_ROOT points code at a separate data tree
 CACHE = ROOT / "gg_cache"               # raw WRDS pulls
 OUT = ROOT / "outputs"
 DATA = OUT / "data"                     # events, screen, panels, return windows (inputs to the tests)

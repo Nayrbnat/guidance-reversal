@@ -256,7 +256,47 @@ def table_s6_mod():
     return reg_table(specs, var, extra, d=2)
 
 
-TABLES = {"s6_mod": table_s6_mod, "s6_sample": table_s6_sample, "s6": table_s6, "s6_s1": table_s6_s1, "stage1": table_stage1, "stage2": table_stage2, "p1": table_p1, "p2": table_p2, "p3": table_p3, "t1": table_t1, "t2": table_t2,
+def table_s7_sample():
+    r = load("stage7_results.json")
+    c, p = r["coverage"], r["power"]
+    cols = [("P7a", "P7a: Stage 6 sample"), ("P7b", "P7b: abrupt exits, non-routine"), ("S2_placebo", "Placebo: planned exits"),
+            ("S3_all_sales", "P7b on all sales"), ("S3_opportunistic", "P7b, opportunistic only")]
+    rows = [["Sale-days"] + [f"{c[k]['sale_days']:,}" for k, _ in cols], ["Firms"] + [f"{c[k]['firms']:,}" for k, _ in cols],
+            ["Sale-days after guidance (G)"] + [f"{c[k]['G']:,}" for k, _ in cols], ["Sale-days followed by the exit studied (X)"] + [f"{c[k]['X']:,}" for k, _ in cols],
+            ["**Guide-sell-leave sale-days (G and X)**"] + [f"**{c[k]['GX']:,}**" for k, _ in cols], ["Firms with such a sale-day"] + [f"{c[k]['GX_firms']:,}" for k, _ in cols]]
+    t1 = md_table([""] + [t for _, t in cols], rows)
+    ex, cl = c["exits"], c["classes"]
+    note = (f"*Exits announced within 365 days after a sale: {ex['X_ann']:,} sale-days, of which {ex['abrupt']:,} abrupt, {ex['planned_or_other']:,} planned or other and "
+            f"{ex['unclassified']:,} unclassified. Sale classes (routine rule): {cl['routine']:,} routine, {cl['opportunistic']:,} opportunistic, {cl['unclassified']:,} unclassified.*")
+    prow = []
+    for k, lab in (("P7a", "P7a"), ("P7b", "P7b")):
+        q = p[k]
+        sim = q["sim"]
+        prow.append([lab, f"{q['se']:.2f}", f"{q['mde']:.2f}", ", ".join(f"{float(a):.1f}" for a in sim), ", ".join(f"{100 * v:.0f}%" for v in sim.values())])
+    prow.append(["Stage 6 primary (for comparison)", "1.69", "4.21", "0.0, 2.1, 4.2, 8.4", "0%, 20%, 82%, 100%"])
+    t2 = md_table(["Power, printed before the estimates", "SE of Z x G x X", "Minimum detectable effect (pp per sd)", "Planted effects (pp per sd)", "Simulated rejection rate"], prow)
+    return t1 + chr(10) * 2 + note + chr(10) * 2 + t2
+
+
+def table_s7():
+    r = load("stage7_results.json")
+    s = r["secondary"]
+    specs = [("(1) P7a", r["P7a"]), ("(2) P7b", r["P7b"]), ("(3) P7a, firm FE", s["S1_P7a_firm_FE"]), ("(4) P7b, firm FE", s["S1_P7b_firm_FE"]),
+             ("(5) Placebo: planned exit", s["S2_placebo_planned_exit"]), ("(6) P7b, all sales", s["S3_P7b_all_sales"]),
+             ("(7) P7b, opportunistic only", s["S3_P7b_opportunistic"]), ("(8) P7b with O", s["S4_P7b_optimistic_O"]), ("(9) P7b, h=21", s["S5_P7b_h21"]),
+             ("(10) P7b, h=126", s["S5_P7b_h126"]), ("(11) P7b, first sale per quarter", s["S6_P7b_first_per_quarter"]), ("(12) P7b, SIC division FE", s["S7_P7b_sic_division"])]
+    var = [("G", "Guided in prior 180 days (G)"), ("X", "Exit studied (X)"), ("GX", "G x X"), ("Z", "Transparency (Z)"), ("ZG", "Z x G"), ("ZX", "Z x X"),
+           ("ZGX", "**Z x G x X**"), ("lmcap", "Log market cap"), ("ret12", "12-month return"), ("lval", "Log sale value"), ("ltenure", "Log tenure"), ("age", "Age"), ("V", "Pre-sale volatility (V)")]
+    fe = ["SIC2 + month", "SIC2 + month", "Firm + month", "Firm + month", "SIC2 + month", "SIC2 + month", "SIC2 + month", "SIC2 + month", "SIC2 + month", "SIC2 + month",
+          "SIC2 + month", "SIC division + month"]
+    k = len(specs)
+    extra = [("Fixed effects", fe), ("Observations (sale-days)", n_row(specs)), ("Guide-sell-leave sale-days (G x X)", [f"{x['n_GX']:,}" for _, x in specs]),
+             ("One-sided p, Z x G x X < 0", [f"{x['p_one']:.2f}" for _, x in specs]), ("Minimum detectable Z x G x X", [f"{x['mde']:.1f}" for _, x in specs]),
+             ("Holm-adjusted p (primary tests only)", [f"{r['holm']['P7a']:.2f}", f"{r['holm']['P7b']:.2f}"] + [""] * (k - 2))]
+    return reg_table(specs, var, extra, d=2)
+
+
+TABLES = {"s7_sample": table_s7_sample, "s7": table_s7, "s6_mod": table_s6_mod, "s6_sample": table_s6_sample, "s6": table_s6, "s6_s1": table_s6_s1, "stage1": table_stage1, "stage2": table_stage2, "p1": table_p1, "p2": table_p2, "p3": table_p3, "t1": table_t1, "t2": table_t2,
           "t3": table_t3, "t4": table_t4, "s5_summary": table_s5_summary}
 
 if __name__ == "__main__":

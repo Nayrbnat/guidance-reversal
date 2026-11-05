@@ -123,6 +123,7 @@ sequenceDiagram
 | 4 | Is there anything in the pattern at all? | Exploration on 2004-2014, selection rule fixed, confirmation on 2015-2025 | Nothing robust; CEO exits not preceded by a sale follow earnings misses |
 | 5 | Is the pattern stronger where segment reporting is opaque? (exploratory; see `docs/STAGE5_SPEC.md`) | A language model scores each 10-K's transparency (0 to 5, blind to returns); reliability gate against a hand audit; four tests of low versus high transparency (T1-T4) | Null: H5 not supported, all four Holm-adjusted p = 1.0 |
 | 6 | Same hypothesis, on individual CEO insider sales (50,123 sale-days, 4,176 of them guide-sell-leave; see `docs/STAGE6_SPEC.md`) | Avoided loss after each sale (four-factor abnormal return with pre-sale betas) with transparency interacted with guided and left; the specification was fixed before any outcome was computed | Null: coefficient +0.27 (standard error 1.69; smallest detectable effect 4.2 points per standard deviation of transparency) |
+| 7 | Do between-firm variation and the original treatment add power? (exploratory re-analysis of the Stage 6 sales; see `docs/STAGE7_SPEC.md`) | Industry-by-month fixed effects (P7a), then abrupt exits and non-routine sales (P7b), Holm over the two; power printed before the estimates | Null: industry effects added no power (standard error 1.78 against 1.69), the restrictions cost power (smallest detectable effect 9.0 against 4.2); Holm-adjusted p = 1.0 for both |
 
 ## Repository map
 
@@ -136,6 +137,7 @@ docs/
   limitations.md           what was fixed, what is still open, future work
   STAGE5_SPEC.md           Stage 5 design, rulings and results (transparency score T, tests T1-T4)
   STAGE6_SPEC.md           Stage 6 design, fixed before any sale-level outcome was computed
+  STAGE7_SPEC.md           Stage 7 design (exploratory re-analysis), fixed before any Stage 7 regression, with its results
   MEMO_TEMPLATE.md         prose of MEMO.md with {{TABLE:name}} placeholders
   MEMO_chronological_2026-10-24.md   the earlier, stage-by-stage memo (kept for reference)
 src/                       all Python (flat; run scripts from the repo root)
@@ -156,10 +158,12 @@ src/                       all Python (flat; run scripts from the repo root)
   gg_stage5.py             Stage 5: T attached with no look-ahead, tests T1-T4, preconditions (--dry-run shuffles T)
   gg_audit_book.py         Stage 5: blind Excel workbook for the hand audit
   gg_stage6.py             Stage 6: CEO sale-days, guidance flags, abnormal returns after each sale, primary regression, power simulation
+  gg_stage7.py             Stage 7: exit announcements with abruptness class, routine versus opportunistic sale rule, two-digit industry codes
 tests/
   test_gg.py               unit tests + simulations (planted-effect recovery, false-positive rate, power)
   test_gg5.py              Stage 5 tests (extraction, scorer, gate, phases, T attachment, T1-T4, memo-independent)
   test_gg6.py              Stage 6 tests (sale-days, guidance timing, abnormal returns with no look-ahead, regressions, power)
+  test_gg7.py              Stage 7 tests (exit timing and abruptness, routine-sale rule with no look-ahead, industry codes, industry-effects regression)
 notebooks/
   guide_and_go_analysis.ipynb   results notebook (generated)
   make_nb.py                    regenerates the notebook
@@ -179,6 +183,7 @@ pyproject.toml, uv.lock    the environment: dependencies and exact locked versio
 scripts/setup_env.sh|.ps1  one-command environment setup with uv
 scripts/score_phases.py, assemble_scores.py   Stage 5: score each phase's first filing in parallel shards; build the filing-level score table
 scripts/run_stage6.py, run_stage6_moderators.py   Stage 6: the sale-level run (prints sample and power before estimates) and the moderator follow-up
+scripts/run_stage7.py      Stage 7: the two primary tests and the secondary checks
 scripts/memo_tables.py, build_memo.py   regression tables from the result files, and the memo built from them
 .env                       WRDS credentials (never commit or share)
 ```

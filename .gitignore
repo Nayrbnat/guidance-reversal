@@ -31,3 +31,7 @@ __pycache__/
 validation/transp_*
 outputs/data/stage5_*
 gg_cache/filings_text/
+
+# Stage 6: the completed hand-audit workbook and any other spreadsheet hold per-filing hand scores
+validation/*.xlsx
+outputs/data/stage6_*

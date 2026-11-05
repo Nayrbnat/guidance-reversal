@@ -6,7 +6,7 @@
 
 ## Summary
 
-Across six stages of tests, no version of the Guidance Reversal pattern predicts underperformance, earnings misses or a higher chance of leaving, and the pattern is not stronger where a firm's reporting is opaque. **These are mostly underpowered nulls, not proofs of absence:** the strict definition has only 42 usable events, and the tests could reliably detect a risk-adjusted return of about -20% a year, not -5% to -10%. The wider tests rule out a large effect and no more. Sections 5.1 to 5.6 give the results and Section 5.7 discusses what they do and do not show. Stage 6, which tests the opacity hypothesis on 4,176 individual guide-sell-leave CEO sales instead of 42 events, is the best-powered test and is also null.
+Across seven stages of tests, no version of the Guidance Reversal pattern predicts underperformance, earnings misses or a higher chance of leaving, and the pattern is not stronger where a firm's reporting is opaque. **These are mostly underpowered nulls, not proofs of absence:** the strict definition has only 42 usable events, and the tests could reliably detect a risk-adjusted return of about -20% a year, not -5% to -10%. The wider tests rule out a large effect and no more. Sections 5.1 to 5.7 give the results and Section 5.8 discusses what they do and do not show. Stage 6, which tests the opacity hypothesis on 4,176 individual guide-sell-leave CEO sales instead of 42 events, is the best-powered test and is also null; a Stage 7 re-analysis (industry fixed effects, abrupt exits, non-routine sales) did not raise power and is null as well.
 
 ---
 
@@ -32,10 +32,11 @@ The project does not test intent: it tests whether the observable pattern is fol
 | 4 | Exploration: is there anything in the pattern at all, found on 2004 to 2014 and confirmed on 2015 to 2025? | A selected effect that keeps its sign and size in the hold-out |
 | 5 | **H5.** The pattern is stronger where the firm's reporting is opaque. Where outsiders can rebuild a firm's profit as price times quantity (high transparency), they can check guidance against the business and an executive has little room to mislead. Where reporting is opaque, the same pattern should hurt more | Each Stage 1 to 3 effect more negative (in the direction of H1 to H3) at low transparency than at high |
 | 6 | **H5-S.** The same H5, tested on individual CEO insider sales: after a guide-sell-leave sale, the stock's later abnormal return is lower (the sale avoided a loss) where transparency is low | A negative coefficient on transparency interacted with guided and left, on the avoided loss after the sale |
+| 7 | **H5-S again**, re-tested on the same sales with industry-by-month fixed effects (lever 1) and then with abrupt exits and non-routine sales only (lever 3) | The same negative coefficient on transparency interacted with guided and left, in either of two primary tests |
 
 ## 1.4 What counts as evidence, and how to read a null
 
-A test supports a hypothesis only if its estimate has the predicted sign and clears a multiple-testing correction. A null is informative only up to the effect size the test could have detected. Every table in Section 5 therefore reports the smallest effect the design could detect (the minimum detectable effect) next to the estimate. Section 5.7 returns to this.
+A test supports a hypothesis only if its estimate has the predicted sign and clears a multiple-testing correction. A null is informative only up to the effect size the test could have detected. Every table in Section 5 therefore reports the smallest effect the design could detect (the minimum detectable effect) next to the estimate. Section 5.8 returns to this.
 
 ---
 
@@ -61,6 +62,7 @@ No paper I found tests the pattern studied here (guidance, then a sale, then a d
 ## 2.3 Does reporting opacity help insiders trade?
 
 - **Duellman et al. (2025)**, *Journal of Business Finance and Accounting*. Insider trades in the 60 days after a filing earn higher returns as accounting reporting complexity rises (abstract).
+- **Cohen, Malloy and Pomorski (2012)**, *Journal of Finance* 67(3), *Decoding Inside Information*. Insider trades with a predictable timing pattern ("routine") carry no information; the remaining "opportunistic" trades earn abnormal returns of 82 basis points a month and predict firm news and the returns around analyst forecasts, management forecasts and earnings announcements (abstract). Stage 7 uses their routine-versus-opportunistic idea.
 - **Journal of Corporate Finance (2026)**, internal information asymmetry and insider trading. After SFAS 131 required more segment detail, divisional managers purchased more often and earned larger profits, so tighter external segment reporting did *not* remove the insider advantage (abstract).
 - **Beneish and Vargus (2002)**, *The Accounting Review*. Income-increasing accruals are less persistent in firms with high insider selling; **Agrawal and Cooper (2015)**, *Journal of Corporate Finance*. Across 500-plus earnings-decreasing restatements, evidence that top managers sold more during the misstated period is weak overall but substantial where incentives to sell were stronger (abstracts).
 
@@ -177,6 +179,7 @@ A razor-and-blade firm (price and quantity only for the low-margin line, dollars
 | 4 | Is there anything in the pattern? | Explore on 2004 to 2014, lock a selection rule, confirm on 2015 to 2025 | A hold-out limits fishing |
 | 5 | Does opacity change the answer? | Tests 1 to 4: the Stage 1 and 3 designs with the transparency score $T$ | Same hypotheses, split by $T$ |
 | 6 | Does opacity change what insiders avoid? | Sale-level avoided loss after CEO sales, with transparency interacted with guided and left | Uses thousands of sales instead of 42 events, as the closest literature does |
+| 7 | Do between-firm variation and the original treatment add power? | Stage 6 regression with industry-by-month effects (P7a), then abrupt exits and non-routine sales (P7b) | Tests whether the Stage 6 null came from the design |
 
 ## 4.2 Stage 1: calendar-time alpha with a placebo test
 
@@ -264,7 +267,24 @@ with firm effects $\lambda_i$, year-month effects $\tau_m$, controls $W_s$ (log 
 
 **Power, printed before the estimates.** The minimum detectable $\theta_3$ is about $2.49$ times its standard error (one-sided 5%, 80% power). A firm-cluster bootstrap plants effects of $-\delta Z_s$ into guide-sell-leave sales and reports how often the primary test rejects at several $\delta$.
 
-## 4.8 Inference and safeguards
+## 4.8 Stage 7: between-firm variation, abrupt exits and routine sales
+
+**Why.** After the Stage 6 null I asked what could add power without changing the question. Two changes were tested in a specification fixed before any Stage 7 regression was run (`docs/STAGE7_SPEC.md`). It is an **exploratory re-analysis**: it uses the same CEO sales as Stage 6, so a significant result would need replication on data not used here.
+
+1. **Industry-by-month fixed effects instead of firm effects (lever 1).** Transparency barely changes within a firm (firm effects remove 95% of the variation in $Z$ itself), and H5 is a statement about opaque firms against transparent ones. The spec records my own correction: this clearly matters for $Z$ on its own, but the H5 term is identified from differences across firms in the effect of a guide-sell-leave sale, so the gain for it was uncertain and was to be read from the printed standard error.
+2. **The original treatment (lever 3).** H1 is about executives who leave **abruptly**, and the literature finds routine insider sales uninformative and opportunistic ones informative (Section 2.3).
+
+**Definitions.** An **abrupt exit** is a departure event announced strictly after the sale and within 365 days that the annotators' label (where one exists) or otherwise the rule-based classifier of the event file calls abrupt; **planned or other** is the complement among classified exits, and sale-days whose exit is announced but unclassified are excluded from the abrupt and placebo tests. A **routine sale** follows the rule of Cohen, Malloy and Pomorski (2012) as specified in the spec: the CEO sold in the same calendar month in each of the three previous calendar years; **opportunistic** means the CEO sold in each of the three previous years but not in that month in all three; **unclassified** means fewer than three prior years of sales. **Non-routine** means not routine, because a first-time or irregular seller cannot have an established pattern. Only years before the sale year are used.
+
+**Primary tests (two, Holm).** Both use SIC two-digit industry and year-month fixed effects, standard errors clustered by firm and month, and the Stage 6 controls plus pre-sale volatility $V_s$:
+
+$$ Y_s = \lambda_{j(i)} + \tau_m + a\,G_s + b\,X_s + c\,(G_sX_s) + \theta_0 Z_s + \theta_1 Z_sG_s + \theta_2 Z_sX_s + \theta_3\,Z_sG_sX_s + \gamma' W_s + \delta V_s + u_s . $$
+
+**P7a** uses the Stage 6 exit variable and sample, so it isolates lever 1. **P7b** uses an abrupt exit and non-routine sale-days, so it adds lever 3. **H5-S: $\theta_3<0$**, one-sided. The project-wide count of formal tests becomes 35.
+
+**Secondary (outside the family).** The same regressions with firm effects; a **placebo** in which $X$ is a planned or other exit; P7b on all sales and on opportunistic sales only; optimistic guidance $O$ in place of $G$; horizons of 21 and 126 trading days; the first sale-day per CEO-quarter; and SIC divisions in place of two-digit industries. The standard error, minimum detectable effect and a firm-cluster bootstrap power simulation are printed for both primary tests before any estimate.
+
+## 4.9 Inference and safeguards
 
 - **Multiple testing.** Holm's method within each stage's family (Stage 1: 8 secondary tests; Stage 2: 14; Stage 3: 3; Stage 5: 4). The project-wide count of formal tests is 32.
 - **Null calibration.** Stage 3 permuted the outcome within year-quarter on the real panels and re-ran P1 and P2 (60 draws): the tests were mildly liberal, so a null is if anything firmer than its p-value. Stage 5 ran the whole pipeline with $T$ shuffled (a dry run) before the real run.
@@ -272,7 +292,7 @@ with firm effects $\lambda_i$, year-month effects $\tau_m$, controls $W_s$ (log 
 - **Power.** Each result is reported with its minimum detectable effect.
 - **Independent review.** A read-only code review of Stage 5 found four issues (including dating $T$ in Test 1 by a different announcement date from the one the return windows use); all were fixed test-first and the results moved by no more than 0.004 in any p-value.
 
-## 4.9 How the code base fits together
+## 4.10 How the code base fits together
 
 Everything runs from the repository root. The data flow is: **WRDS pulls and features** $\to$ **validated labels** $\to$ **Stage 1 to 4 tests** $\to$ **Stage 5 transparency pipeline** $\to$ **results JSON** $\to$ **this memo**.
 
@@ -288,9 +308,10 @@ Everything runs from the repository root. The data flow is: **WRDS pulls and fea
 | Stage 5 scorer | `src/gg_transparency.py`, `scripts/score_phases.py`, `scripts/assemble_scores.py` | Rubric, extraction, frozen configuration, the Claude Code scorer, reliability gate; scores each phase's first filing in parallel shards; builds `stage5_scores.pkl` using only reads made on the current text |
 | Stage 5 tests | `src/gg_stage5.py` | Attaches $T$ with no look-ahead, Tests 1 to 4, secondary analyses, preconditions, dry run (`--dry-run`) and the registered run |
 | Stage 6 | `src/gg_stage6.py`, `scripts/run_stage6.py`, `scripts/run_stage6_moderators.py` | CEO sale-days (value filter, exit flag), guidance flags with no look-ahead, cumulative abnormal returns after each sale with pre-sale betas, the primary regression, power simulation; the run script prints the sample and power before the estimates |
+| Stage 7 | `src/gg_stage7.py`, `scripts/run_stage7.py` | Exit announcements with abruptness class, the routine versus opportunistic sale rule with no look-ahead, two-digit industry codes; the run script prints samples and power before the estimates, then runs the two primary tests (Holm) and the secondary checks |
 | Hand audit | `src/gg_audit_book.py` | Builds the blind Excel workbook for the 100-filing hand audit |
 | Reporting | `scripts/memo_tables.py`, `scripts/build_memo.py`, `notebooks/make_nb.py` | Regression tables from the result files; this memo; the results notebook |
-| Tests | `tests/test_gg.py`, `tests/test_gg5.py`, `tests/test_gg6.py` | Unit tests and simulations (planted-effect recovery, false-positive rate, power) for Stages 1 to 4, Stage 5 and Stage 6 |
+| Tests | `tests/test_gg.py`, `tests/test_gg5.py`, `tests/test_gg6.py`, `tests/test_gg7.py` | Unit tests and simulations (planted-effect recovery, false-positive rate, power) for Stages 1 to 4 and Stages 5 to 7 |
 
 To rebuild: `python src/guide_and_go.py build`, then `src/gg_study.py`, `src/gg_variants.py`, `src/gg_stage3.py`, `src/gg_stage4.py`; for Stage 5 `scripts/score_phases.py`, `scripts/assemble_scores.py` and `src/gg_stage5.py`; finally `python scripts/build_memo.py`. The README lists every file and the commands.
 
@@ -398,7 +419,25 @@ None of the four tests supports H5, and after Holm correction every adjusted p-v
 
 **Caveats specific to this stage.** About a quarter of sale-days of at least $100,000 (16,435 of 68,247) have no transparency score because the last 10-K before the sale was not among the 24,154 filings scored in Stage 5; those are mostly firm-quarters outside the guidance panel, so the sample leans toward guiding firms (89% of the primary sample follow guidance). The exit flag is ex-post, 10b5-1 plan sales cannot be separated before 2023, repeated sales have overlapping windows (handled by firm clustering and by the first-sale-per-quarter column), and $T$ carries the Stage 5 measurement limits. One secondary test (S1) was first run with the wrong one-sided tail and re-run on the saved panel (p 0.775 became 0.225); the primary regression was not affected.
 
-## 5.7 Discussion
+## 5.7 Stage 7: between-firm variation, abrupt exits and routine sales
+
+**Table 5.7a. Samples and power (power was printed before any estimate)**
+
+{{TABLE:s7_sample}}
+
+**Table 5.7b. Avoided loss after CEO sales with industry fixed effects (outcome: $-100 \times$ four-factor abnormal return over the next 63 trading days unless stated, percentage points)**
+
+{{TABLE:s7}}
+
+*Columns (1) and (2) are the two primary tests; the rest are secondary. In (8) the rows labelled G, G x X, Z x G and Z x G x X are based on optimistic guidance $O$. The H5 coefficient is Z x G x X (bold): a negative value supports H5.*
+
+**Neither lever raised power.** Lever 1 alone (P7a) gives a coefficient of +0.07 with a standard error of **1.78**, against Stage 6's 1.69, and the firm-effects version on the same sample (column 3) gives +0.17 (1.68). So industry-by-month effects bought nothing for the H5 term, as the spec had warned they might not. Adding the abrupt-exit and non-routine restrictions (P7b) **lowered** power: only 583 guide-sell-leave sale-days from 142 firms remain, the standard error is 3.62 and the smallest detectable effect is **9.0** points per standard deviation of $T$, more than twice Stage 6's 4.2. P7b's estimate is +2.53, with a one-sided p of 0.76.
+
+**Result.** Both primary tests are null: one-sided p-values of 0.52 and 0.76, Holm-adjusted 1.0 for both. The placebo with planned exits is also null (+0.04, standard error 2.93). Dropping routine sales, using only opportunistic ones, changes the sign to the H5 direction but not the conclusion ($-6.1$, standard error 5.4, one-sided p 0.13, from 279 sale-days at 56 firms). The 21-day, 126-day, first-sale-per-quarter and SIC-division versions all have the opposite sign.
+
+**One nominally significant secondary result, which is not a finding.** With optimistic guidance in place of any guidance, the abrupt-exit test gives $-5.33$ (standard error 2.57, one-sided p 0.021, two-sided 0.042) from 243 guide-sell-leave sale-days. I report it because it points in the H5 direction, but: (1) it is one of ten secondary tests in a re-analysis of data already used, so the chance that at least one reaches 5% by luck alone is about 40%; (2) it rests on 243 sale-days, which the power table shows is too few to detect effects under 9 points per standard deviation reliably, so a significant estimate at that size is as likely to be an overestimate as a discovery; (3) the optimism split is exactly where Stage 2's one significant result (L3 x U1) appeared and then fell apart (Section 5.2). It is a lead for a pre-registered test on data not yet used, and nothing more.
+
+## 5.8 Discussion
 
 **What do the results answer?** Stages 1 to 3 answer: *is there a large, average underperformance, extra exit risk or extra earnings miss attached to guide-sell-leave?* The answer is no. Stage 5 answers a narrower question: *is the difference between low-transparency and high-transparency firms large enough to be seen with 24 and 18 flagged events and these noisy interaction tests?* The answer is again no. Stage 6 asks it on 50,123 CEO sale-days (4,176 of them guide-sell-leave sales) and finds a coefficient of +0.27 (standard error 1.69) against a minimum detectable effect of 4.2 points per standard deviation of $T$. It does not answer whether transparency matters, and my earlier wording that the null "does not hide a pattern" was too strong.
 
@@ -414,6 +453,8 @@ None of the four tests supports H5, and after Holm correction every adjusted p-v
 | Test 3, Z x O x S x X | 0.62 | 1,006 cells |
 | Test 4 | standard error 0.044 | 81 and 65 leavers |
 | Stage 6, Z x G x X | 4.2 pp of the 63-day abnormal return per standard deviation of $T$ | 4,176 guide-sell-leave sale-days |
+| Stage 7 P7a (industry effects) | 4.4 pp per standard deviation | 4,176 guide-sell-leave sale-days |
+| Stage 7 P7b (abrupt exits, non-routine) | 9.0 pp per standard deviation | 583 sale-days from 142 firms |
 
 A real opacity effect of 5 to 10 points a year would not have been visible. The bottleneck is the number of flagged events; the interaction tests (a difference of a difference of a difference) are the weakest of all.
 
@@ -423,19 +464,19 @@ A real opacity effect of 5 to 10 points a year would not have been visible. The 
 
 **Limitations.** Only the S&P 1500 and CEOs in the panels (CFO exits are not recorded in ExecuComp); the strict flag has 42 events, half in technology; annotators are language models, not people, and insider name matching is tested but not hand-audited; the model scores $T$ about half a point above my own scores, and recognises the firm 55% of the time even with names stripped (recognised firms scored 0.36 points higher, not significantly); phases carry one score across filings (first and last filing differ by 0.5 points); materials are limited to EDGAR filings; point-in-time index membership could not be verified; the complexity controls for Tests 2 and 3 (log assets, segment count) are not in the panels, so those sensitivities were skipped.
 
-**What Stage 6 changed, and what could still raise power.** Moving from 42 events to individual insider sales (the design of the closest literature) cut the minimum detectable effect, but the result is still null. Remaining levers: a graded measure of how closely each of the 5,163 departures resembles guide-sell-leave; outcomes measured where the news arrives (abnormal returns in the three days around each of the next earnings releases, plus the earnings surprises); two filings per phase averaged to cut the noise in $T$ (reliability from about 0.68 to about 0.81); scoring the roughly 24% of sale-days that have no $T$; and the detectability moderators that need data not in the cache (analyst coverage, trading volume, accruals, institutional ownership; Section 4.7). Any further redesign must be written down before it touches data, and ideally run on events not yet used, because these results have been seen.
+**What Stages 6 and 7 changed, and what could still raise power.** Moving from 42 events to individual insider sales (Stage 6) cut the minimum detectable effect, but the result is still null. Stage 7 then tested the two changes I had thought would add power: industry-by-month effects did **not** (standard error 1.78 against 1.69; the H5 term is identified from differences across firms in the effect, which firm effects do not remove, so the firm-effects design was not the bottleneck I first thought), and restricting to abrupt exits and non-routine sales **lowered** power, because only 583 guide-sell-leave sale-days from 142 firms remain (minimum detectable effect 9.0 against 4.2). The binding constraint is the number of guide-sell-leave sales and the number of firms behind them. The levers that act on that are a larger population (other officers, directors, 2025 to 2026), outcomes measured where the news arrives (abnormal returns in the three days around each of the next earnings releases, plus the earnings surprises), two filings per phase averaged to cut the noise in $T$ (reliability from about 0.68 to about 0.81), scoring the roughly 24% of sale-days that have no $T$, and the detectability moderators that need data not in the cache (analyst coverage, trading volume, accruals, institutional ownership; Section 4.7). Any further redesign must be written down before it touches data and run on events not yet used, because these results have been seen.
 
 **What to take away.**
 1. The "guide, sell, leave" story is **not supported** here; the early positive-looking numbers came from data and labelling errors.
-2. Opacity does not rescue it. Stage 5 could only exclude very large effects, and Stage 6, with 4,176 guide-sell-leave sales, excludes avoided-loss effects stronger than about 3 points per standard deviation of $T$ over a quarter; neither can say whether a small effect exists.
+2. Opacity does not rescue it. Stage 5 could only exclude very large effects, and Stage 6, with 4,176 guide-sell-leave sales, excludes avoided-loss effects stronger than about 3 points per standard deviation of $T$ over a quarter. The Stage 7 re-analysis did not add power. None of them can say whether a small effect exists, and one nominally significant secondary Stage 7 result (abrupt exits after optimistic guidance, p 0.02) is a lead to test on new data, not a finding.
 3. The project's value is the pipeline and the discipline: it found and fixed its own data problems, validated its measurement, pre-specified its tests, and reported nulls with their power.
 
-**Honest disclosures.** The Stage 1 test plan was written after I had seen earlier versions of the project, and a dry-run mistake exposed two secondary results (both null) beforehand (`docs/PREREGISTRATION.md`). Stage 2 followed a Stage 1 null. Stage 5 was designed after the Stage 1 to 4 nulls and its first run was repeated after a code review. The tests are not independent of one another (same firms and sales data). Stage 6 was proposed after the Stage 5 results were seen, though its specification (`docs/STAGE6_SPEC.md`) was fixed before any sale-level outcome was computed; one secondary test of it (S1) was first run with the wrong one-sided tail and re-run. Open items and what was fixed are in `docs/limitations.md`, `docs/STAGE5_SPEC.md` and `docs/STAGE6_SPEC.md`.
+**Honest disclosures.** The Stage 1 test plan was written after I had seen earlier versions of the project, and a dry-run mistake exposed two secondary results (both null) beforehand (`docs/PREREGISTRATION.md`). Stage 2 followed a Stage 1 null. Stage 5 was designed after the Stage 1 to 4 nulls and its first run was repeated after a code review. The tests are not independent of one another (same firms and sales data). Stage 6 was proposed after the Stage 5 results were seen, though its specification (`docs/STAGE6_SPEC.md`) was fixed before any sale-level outcome was computed; one secondary test of it (S1) was first run with the wrong one-sided tail and re-run. Stage 7 is an exploratory re-analysis of the Stage 6 sales, specified before it was run (it looked only at counts and variance facts beforehand), and one of its design arguments (that firm effects were costing power for the H5 term) was overstated by me and corrected in its spec before any regression. Open items and what was fixed are in `docs/limitations.md`, `docs/STAGE5_SPEC.md`, `docs/STAGE6_SPEC.md` and `docs/STAGE7_SPEC.md`.
 
-## 5.8 Next steps
+## 5.9 Next steps
 
-1. Load the data for the detectability moderators the cache lacks (analyst coverage and dispersion, trading volume, accruals, institutional ownership) and run them as a pre-specified follow-up on the saved Stage 6 panel.
-2. Score the filings that the 16,435 unscored sale-days point to, so Stage 6 covers firms outside the guidance panel.
-3. Larger universe (micro-caps, other officers, non-U.S.) for more flagged events.
-4. A human audit of 50 to 100 labels and 50 insider matches.
+1. **A confirmatory test on data not yet used**, pre-registered before it is run: the sale-level H5 test on all officers (CFOs and other executives, which needs their departures from the Capital IQ text, since the event file holds almost none) and on 2025 to 2026 sales, with the optimistic-guidance and abrupt-exit variant that Stage 7 left as a lead written in as one named test.
+2. Add the detectability moderators the cache lacks (analyst coverage and dispersion, trading volume, accruals, institutional ownership).
+3. Score the filings that the 16,435 unscored sale-days point to, so Stage 6 and 7 cover firms outside the guidance panel.
+4. A human audit of 50 to 100 labels and 50 insider matches, and a check of the abruptness classifier's precision, which Stage 7 relies on.
 5. A direct test of the mechanism: guidance misses that are matched on accounting basis, after the executive leaves.

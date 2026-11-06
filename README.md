@@ -138,6 +138,7 @@ docs/
   STAGE5_SPEC.md           Stage 5 design, rulings and results (transparency score T, tests T1-T4)
   STAGE6_SPEC.md           Stage 6 design, fixed before any sale-level outcome was computed
   STAGE7_SPEC.md           Stage 7 design (exploratory re-analysis), fixed before any Stage 7 regression, with its results
+  STAGE8_SPEC.md           Stage 8 design (opacity mechanism on all officers and directors), fixed before any Stage 8 outcome, with its results
   MEMO_TEMPLATE.md         prose of MEMO.md with {{TABLE:name}} placeholders
   MEMO_chronological_2026-10-24.md   the earlier, stage-by-stage memo (kept for reference)
 src/                       all Python (flat; run scripts from the repo root)
@@ -159,11 +160,13 @@ src/                       all Python (flat; run scripts from the repo root)
   gg_audit_book.py         Stage 5: blind Excel workbook for the hand audit
   gg_stage6.py             Stage 6: CEO sale-days, guidance flags, abnormal returns after each sale, primary regression, power simulation
   gg_stage7.py             Stage 7: exit announcements with abruptness class, routine versus opportunistic sale rule, two-digit industry codes
+  gg_stage8.py             Stage 8: officer and director sale-days, date-valid CUSIP and gvkey links, mechanism regression and power simulation
 tests/
   test_gg.py               unit tests + simulations (planted-effect recovery, false-positive rate, power)
   test_gg5.py              Stage 5 tests (extraction, scorer, gate, phases, T attachment, T1-T4, memo-independent)
   test_gg6.py              Stage 6 tests (sale-days, guidance timing, abnormal returns with no look-ahead, regressions, power)
   test_gg7.py              Stage 7 tests (exit timing and abruptness, routine-sale rule with no look-ahead, industry codes, industry-effects regression)
+  test_gg8.py              Stage 8 tests (role groups, date-valid links, sale-day building, mechanism regression and power)
 notebooks/
   guide_and_go_analysis.ipynb   results notebook (generated)
   make_nb.py                    regenerates the notebook
@@ -184,6 +187,7 @@ scripts/setup_env.sh|.ps1  one-command environment setup with uv
 scripts/score_phases.py, assemble_scores.py   Stage 5: score each phase's first filing in parallel shards; build the filing-level score table
 scripts/run_stage6.py, run_stage6_moderators.py   Stage 6: the sale-level run (prints sample and power before estimates) and the moderator follow-up
 scripts/run_stage7.py      Stage 7: the two primary tests and the secondary checks
+scripts/run_stage8.py      Stage 8: the mechanism test on all officers and directors and the secondary checks
 scripts/memo_tables.py, build_memo.py   regression tables from the result files, and the memo built from them
 .env                       WRDS credentials (never commit or share)
 ```

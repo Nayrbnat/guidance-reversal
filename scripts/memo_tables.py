@@ -296,7 +296,40 @@ def table_s7():
     return reg_table(specs, var, extra, d=2)
 
 
-TABLES = {"s7_sample": table_s7_sample, "s7": table_s7, "s6_mod": table_s6_mod, "s6_sample": table_s6_sample, "s6": table_s6, "s6_s1": table_s6_s1, "stage1": table_stage1, "stage2": table_stage2, "p1": table_p1, "p2": table_p2, "p3": table_p3, "t1": table_t1, "t2": table_t2,
+def table_s8_sample():
+    r = load("stage8_results.json")
+    c, p = r["coverage"], r["power"]
+    br, cl = c["by_role"], c["classes"]
+    rows = [["Officer and director insider-days of at least $100,000, linked to a firm and a price", f"{c['linked']:,}"],
+            ["... with the avoided loss available (price data)", f"{c['with_car']:,}"], ["... with a transparency score T (strictly prior 10-K, not stale)", f"{c['with_T']:,}"],
+            ["**Primary sample**", f"**{c['primary_sample']:,}** insider-days, {c['firms']:,} firms, {c['people']:,} people"],
+            ["By role: CEO, CFO, other officers, directors", f"{br['CEO']:,}, {br['CFO']:,}, {br['OFFICER']:,}, {br['DIRECTOR']:,}"],
+            ["Sale classes: routine, opportunistic, unclassified", f"{cl['routine']:,}, {cl['opportunistic']:,}, {cl['unclassified']:,}"],
+            ["Share of sale-days after guidance in the prior 180 days", f"{100 * c['G_share']:.0f}%"],
+            ["Standard error of the coefficient on Z (pp per sd of T)", f"{p['se']:.3f}"],
+            ["Minimum detectable effect (one-sided 5%, 80% power), pp per sd of T", f"{p['mde']:.2f}"],
+            ["Simulated rejection rate at planted effects " + ", ".join(f"{float(k):.2f}" for k in p["sim"]) + " (pp per sd)", ", ".join(f"{100 * v:.0f}%" for v in p["sim"].values())],
+            ["Insider-days with a price but no T, by reason", ", ".join(f"{k}: {v:,}" for k, v in c["missing_T_reasons"].items() if k)]]
+    return md_table(["", "Count or value"], rows)
+
+
+def table_s8():
+    r = load("stage8_results.json")
+    s = r["secondary"]
+    specs = [("(1) Primary", r["primary"]), ("(2) Non-routine", s["S1_non_routine"]), ("(3) Opportunistic", s["S1_opportunistic"]), ("(4) CEOs", s["S2_CEO"]),
+             ("(5) CFOs", s["S2_CFO"]), ("(6) Other officers", s["S2_OFFICER"]), ("(7) Directors", s["S2_DIRECTOR"]), ("(8) With Z x G", s["S3_Z_x_G"]),
+             ("(9) h=21", s["S4_h21"]), ("(10) h=126", s["S4_h126"]), ("(11) High-T dummy", s["S5_high_T_dummy"]), ("(12) Firm FE", s["S6_firm_FE"]),
+             ("(13) Sales >= $1M", s["S7_ge1m"]), ("(14) First per person-quarter", s["S8_first_per_person_quarter"]), ("(15) Small firms", s["S9_small_firms"]),
+             ("(16) Large firms", s["S9_large_firms"])]
+    var = [("G", "Guided in prior 180 days (G)"), ("Z", "**Transparency (Z)**"), ("ZG", "**Z x G**"), ("lmcap", "Log market cap"), ("ret12", "12-month return"),
+           ("lval", "Log sale value"), ("V", "Pre-sale volatility (V)"), ("role_CEO", "CEO"), ("role_CFO", "CFO"), ("role_DIRECTOR", "Director")]
+    fe = ["SIC2 + quarter"] * 11 + ["Firm + quarter"] + ["SIC2 + quarter"] * 4
+    extra = [("Fixed effects", fe), ("Observations (insider-days)", n_row(specs)), ("One-sided p, coefficient < 0", [f"{x['p_one']:.2f}" for _, x in specs]),
+             ("Minimum detectable effect", [f"{x['mde']:.2f}" for _, x in specs])]
+    return reg_table(specs, var, extra, d=3)
+
+
+TABLES = {"s8_sample": table_s8_sample, "s8": table_s8, "s7_sample": table_s7_sample, "s7": table_s7, "s6_mod": table_s6_mod, "s6_sample": table_s6_sample, "s6": table_s6, "s6_s1": table_s6_s1, "stage1": table_stage1, "stage2": table_stage2, "p1": table_p1, "p2": table_p2, "p3": table_p3, "t1": table_t1, "t2": table_t2,
           "t3": table_t3, "t4": table_t4, "s5_summary": table_s5_summary}
 
 if __name__ == "__main__":

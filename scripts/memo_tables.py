@@ -329,7 +329,39 @@ def table_s8():
     return reg_table(specs, var, extra, d=3)
 
 
-TABLES = {"s8_sample": table_s8_sample, "s8": table_s8, "s7_sample": table_s7_sample, "s7": table_s7, "s6_mod": table_s6_mod, "s6_sample": table_s6_sample, "s6": table_s6, "s6_s1": table_s6_s1, "stage1": table_stage1, "stage2": table_stage2, "p1": table_p1, "p2": table_p2, "p3": table_p3, "t1": table_t1, "t2": table_t2,
+def table_s9_sample():
+    r = load("stage9_results.json")
+    c, p = r["coverage"], r["power"]
+    br = c["by_role"]
+    rows = [["Officer and director insider-days of at least $100,000, 2025-01 to 2025-09, linked to a firm", f"{c['linked']:,}"],
+            ["... with the avoided loss and a transparency score T", f"{c['primary_sample']:,}"],
+            ["**Primary sample**", f"**{c['primary_sample']:,}** insider-days, {c['firms']:,} firms, {c['people']:,} people, quarters " + ", ".join(c["quarters"])],
+            ["By role: CEO, CFO, other officers, directors", f"{br['CEO']:,}, {br['CFO']:,}, {br['OFFICER']:,}, {br['DIRECTOR']:,}"],
+            ["Share of sale-days after guidance in the prior 180 days", f"{100 * c['G_share']:.0f}%"],
+            ["Standard error of the coefficient on Z (pp per sd of T), firm-clustered", f"{p['se']:.3f}"],
+            ["Minimum detectable effect (one-sided 5%, 80% power), pp per sd of T", f"{p['mde']:.2f}"],
+            ["Simulated rejection rate at planted effects " + ", ".join(f"{float(k):.2f}" for k in p["sim"]) + " (pp per sd)", ", ".join(f"{100 * v:.0f}%" for v in p["sim"].values())]]
+    return md_table(["", "Count or value"], rows)
+
+
+def table_s9():
+    r = load("stage9_results.json")
+    s = r["secondary"]
+    specs = [("(1) Primary", r["primary"]), ("(2) Other officers", s["S1_other_officers"]), ("(3) Large firms", s["S1_large_firms"]), ("(4) With Z x G", s["S2_Z_x_G"])]
+    var = [("G", "Guided in prior 180 days (G)"), ("Z", "**Transparency (Z)**"), ("ZG", "**Z x G**"), ("lmcap", "Log market cap"), ("ret12", "12-month return"),
+           ("lval", "Log sale value"), ("V", "Pre-sale volatility (V)"), ("role_CEO", "CEO"), ("role_CFO", "CFO"), ("role_DIRECTOR", "Director")]
+    extra = [("Fixed effects", ["SIC2 + quarter"] * 4), ("Observations (insider-days)", n_row(specs)), ("One-sided p, coefficient < 0", [f"{x['p_one']:.2f}" for _, x in specs]),
+             ("Minimum detectable effect", [f"{x['mde']:.2f}" for _, x in specs])]
+    return reg_table(specs, var, extra, d=3)
+
+
+def table_s9_walk():
+    r = load("stage9_results.json")["walk_forward"]
+    rows = [[str(w["test_year"]), f"{w['n_test']:,}", "" if w["test_all"] is None else f"{w['test_all']:.2f}", w["selected"] or "", "" if w["test_selected"] is None else f"{w['test_selected']:.2f}"] for w in r]
+    return md_table(["Test year", "Insider-days", "theta, all sales in the test year", "Subset chosen on the previous 5 years", "theta, chosen subset"], rows)
+
+
+TABLES = {"s9_sample": table_s9_sample, "s9": table_s9, "s9_walk": table_s9_walk, "s8_sample": table_s8_sample, "s8": table_s8, "s7_sample": table_s7_sample, "s7": table_s7, "s6_mod": table_s6_mod, "s6_sample": table_s6_sample, "s6": table_s6, "s6_s1": table_s6_s1, "stage1": table_stage1, "stage2": table_stage2, "p1": table_p1, "p2": table_p2, "p3": table_p3, "t1": table_t1, "t2": table_t2,
           "t3": table_t3, "t4": table_t4, "s5_summary": table_s5_summary}
 
 if __name__ == "__main__":

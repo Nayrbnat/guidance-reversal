@@ -141,6 +141,7 @@ docs/
   STAGE7_SPEC.md           Stage 7 design (exploratory re-analysis), fixed before any Stage 7 regression, with its results
   STAGE8_SPEC.md           Stage 8 design (opacity mechanism on all officers and directors), fixed before any Stage 8 outcome, with its results
   LOSS_RATE_SPEC.md        Stage 9 (large-loss-rate test): the registered design, then its result
+  STAGE9_SPEC.md           Stage 9 design (held-out confirmation on 2025 sales), fixed before any 2025 return, with its results
   MEMO_TEMPLATE.md         prose of MEMO.md with {{TABLE:name}} placeholders
   MEMO_chronological_2026-10-24.md   the earlier, stage-by-stage memo (kept for reference)
 src/                       all Python (flat; run scripts from the repo root)
@@ -164,6 +165,7 @@ src/                       all Python (flat; run scripts from the repo root)
   gg_stage7.py             Stage 7: exit announcements with abruptness class, routine versus opportunistic sale rule, two-digit industry codes
   gg_stage8.py             Stage 8: officer and director sale-days, date-valid CUSIP and gvkey links, mechanism regression and power simulation
   gg_lossrate.py           Stage 9: share of firms with a large 12-month loss, flagged vs placebo groups and vs guided firms with no sale
+  gg_crsp_ciz.py           CRSP v2 (CIZ) names and returns converted to the project layout; new name rows win; overlap check
 tests/
   test_gg.py               unit tests + simulations (planted-effect recovery, false-positive rate, power)
   test_gg5.py              Stage 5 tests (extraction, scorer, gate, phases, T attachment, T1-T4, memo-independent)
@@ -171,6 +173,7 @@ tests/
   test_gg7.py              Stage 7 tests (exit timing and abruptness, routine-sale rule with no look-ahead, industry codes, industry-effects regression)
   test_gg8.py              Stage 8 tests (role groups, date-valid links, sale-day building, mechanism regression and power)
   test_gg_lossrate.py      Stage 9 tests (flag logic, BHAR arithmetic, planted-effect placebo test, within-departure comparator)
+  test_gg_ciz.py           CRSP v2 conversion tests (columns, types, name-merge priority, overlap report)
 notebooks/
   guide_and_go_analysis.ipynb   results notebook (generated)
   make_nb.py                    regenerates the notebook
@@ -192,6 +195,9 @@ scripts/score_phases.py, assemble_scores.py   Stage 5: score each phase's first 
 scripts/run_stage6.py, run_stage6_moderators.py   Stage 6: the sale-level run (prints sample and power before estimates) and the moderator follow-up
 scripts/run_stage7.py      Stage 7: the two primary tests and the secondary checks
 scripts/run_stage8.py      Stage 8: the mechanism test on all officers and directors and the secondary checks
+scripts/pull_crsp_2025.py  Stage 9: pull CRSP v2 names and 2023-2025 returns and the factors through the REST API (new cache files only)
+scripts/phases_2025.py     Stage 9: extend phases to 2025 filings, refusing to write if any existing filing changes
+scripts/run_stage9.py      Stage 9: the held-out 2025 test (power first, one primary test) and the exploratory walk-forward
 scripts/memo_tables.py, build_memo.py   regression tables from the result files, and the memo built from them
 .env                       WRDS credentials (never commit or share)
 ```

@@ -1,0 +1,74 @@
+[
+ {
+  "variant": "A. Stage 8 baseline (SIC2 + quarter, firm and quarter clusters)",
+  "n": 204174,
+  "se": 0.15164824989427325,
+  "sd_y": 13.48878927449815,
+  "mde": 0.37760414223674044,
+  "mde_in_sd_of_y": 0.027993924032206307
+ },
+ {
+  "variant": "B. baseline, firm clusters only",
+  "n": 204174,
+  "se": 0.13026359483305164,
+  "sd_y": 13.48878927449815,
+  "mde": 0.3243563511342986,
+  "mde_in_sd_of_y": 0.024046365061653488
+ },
+ {
+  "variant": "C. industry-by-quarter effects, firm clusters",
+  "n": 204174,
+  "se": 0.12279234916591442,
+  "sd_y": 13.48878927449815,
+  "mde": 0.3057529494231269,
+  "mde_in_sd_of_y": 0.022667190005049766
+ },
+ {
+  "variant": "D. flexible controls (squares of size, return, volatility)",
+  "n": 204174,
+  "se": 0.13148164104523838,
+  "sd_y": 13.48878927449815,
+  "mde": 0.32738928620264357,
+  "mde_in_sd_of_y": 0.024271213638247312
+ },
+ {
+  "variant": "E. D plus industry-by-quarter effects",
+  "n": 204174,
+  "se": 0.12436308843432389,
+  "sd_y": 13.48878927449815,
+  "mde": 0.3096640902014665,
+  "mde_in_sd_of_y": 0.02295714492233311
+ },
+ {
+  "variant": "F. outcome scaled by the stock's own 63-day volatility (new units)",
+  "n": 204174,
+  "se": 0.0072730337119159575,
+  "sd_y": 0.8009330419116744,
+  "mde": 0.018109853942670735,
+  "mde_in_sd_of_y": 0.02261094622772207
+ },
+ {
+  "variant": "G. F plus industry-by-quarter effects",
+  "n": 204174,
+  "se": 0.007045598788417528,
+  "sd_y": 0.8009330419116744,
+  "mde": 0.017543540983159644,
+  "mde_in_sd_of_y": 0.02190387968173539
+ },
+ {
+  "variant": "H21. horizon 21 trading days",
+  "n": 204174,
+  "se": 0.04778215209965688,
+  "sd_y": 6.990386512751956,
+  "mde": 0.11897755872814564,
+  "mde_in_sd_of_y": 0.01702016884346884
+ },
+ {
+  "variant": "H126. horizon 126 trading days",
+  "n": 202997,
+  "se": 0.2396376451257548,
+  "sd_y": 19.59995895274814,
+  "mde": 0.5966977363631295,
+  "mde_in_sd_of_y": 0.030443825816250786
+ }
+]

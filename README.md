@@ -199,6 +199,7 @@ scripts/run_stage8.py      Stage 8: the mechanism test on all officers and direc
 scripts/pull_crsp_2025.py  Stage 9: pull CRSP v2 names and 2023-2025 returns and the factors through the REST API (new cache files only)
 scripts/phases_2025.py     Stage 9: extend phases to 2025 filings, refusing to write if any existing filing changes
 scripts/run_stage9.py      Stage 9: the held-out 2025 test (power first, one primary test) and the exploratory walk-forward
+scripts/se_bakeoff_stage8.py Stage 10: standard-error-only comparison of design variants (no coefficients printed or saved)
 scripts/memo_tables.py, build_memo.py   regression tables from the result files, and the memo built from them
 .env                       WRDS credentials (never commit or share)
 ```

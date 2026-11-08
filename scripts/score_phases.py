@@ -35,8 +35,10 @@ def variants(conm):
     return sorted({c.title(), base.title()}, key=len, reverse=True)
 
 
-pt = pd.read_csv(G.CACHE / "phase_table.csv", dtype={"gvkey": str, "accession": str, "phase_first": str})
-need = pd.read_csv(G.CACHE / "phase_needed.csv", dtype=str)
+PT_NAME = sys.argv[2] if len(sys.argv) > 2 else "phase_table.csv"          # extension run: python scripts/score_phases.py 4 phase_table_2025.csv phase_needed_all.csv
+NEED_NAME = sys.argv[3] if len(sys.argv) > 3 else "phase_needed.csv"
+pt = pd.read_csv(G.CACHE / PT_NAME, dtype={"gvkey": str, "accession": str, "phase_first": str})
+need = pd.read_csv(G.CACHE / NEED_NAME, dtype=str)
 firsts = pt[["gvkey", "phase_first"]].drop_duplicates().rename(columns={"phase_first": "accession"}).merge(need[["accession", "cik", "url", "filing_date"]], on="accession")
 firsts = firsts.iloc[::-1].reset_index(drop=True)                     # from the end
 ev = pd.read_csv(G.DATA / "events.csv", dtype={"gvkey": str})
@@ -64,6 +66,8 @@ if status_path.exists():
         done_status[r["unit_id"]] = r["status"]
 t0 = time.time()
 counter = {"done": 0}
+if len(sys.argv) > 2:                                                       # extension run: only units never handled before
+    firsts = firsts[~firsts["accession"].isin(done_status)].reset_index(drop=True)
 print(f"units {len(firsts)}, workers {workers}, already have status for {len(done_status)}", flush=True)
 
 

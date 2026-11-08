@@ -78,9 +78,9 @@ def insider_sale_days(ins: pd.DataFrame, names: pd.DataFrame, link: pd.DataFrame
 
 # ---------------------------------------------------------------- the mechanism regression and its power
 def run_mechanism(d: pd.DataFrame, y: str, *, z: str = "Z", g: str | None = None, controls=(), firm: str = "sic2", period: str = "yq",
-                  cluster: str = "gvkey") -> dict:
+                  cluster: str = "gvkey", two_way: bool = True) -> dict:
     """y on Z (or on G, Z and Z x G when g is given) and controls, with `firm` (industry) and `period` fixed effects and standard errors
-    clustered by `cluster` and by `period`. Key Z (or ZG); H5 predicts a NEGATIVE coefficient (the avoided loss is larger where
+    clustered by `cluster` and (when two_way, the default) by `period`. Key Z (or ZG); H5 predicts a NEGATIVE coefficient (the avoided loss is larger where
     transparency is low), so the one-sided p is taken for sign -1."""
     import gg_econ as E
     import gg_stage3 as S3
@@ -94,7 +94,7 @@ def run_mechanism(d: pd.DataFrame, y: str, *, z: str = "Z", g: str | None = None
         xs = ["G", "Z", "ZG"]
         key = "ZG"
     xs = xs + [c for c in controls if c in d.columns]
-    res = E.fe_ols(d, y, xs, firm=firm, year=period, cluster=cluster, cluster2=period)
+    res = E.fe_ols(d, y, xs, firm=firm, year=period, cluster=cluster, cluster2=period if two_way else None)
     return S3.summarise(res, key, -1)
 
 

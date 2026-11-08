@@ -1,0 +1,119 @@
+{
+ "spec": "docs/LOSS_RATE_SPEC.md",
+ "reps": 5000,
+ "n_eligible": 3650,
+ "n_with_bhar": 3334,
+ "overall_loss_share": {
+  "-0.3": 0.21025794841031795,
+  "-0.2": 0.3104379124175165,
+  "-0.4": 0.14337132573485303
+ },
+ "primary": {
+  "threshold": -0.3,
+  "n_flagged": 480,
+  "n_loss_flagged": 68,
+  "rate_flagged": 0.14166666666666666,
+  "placebo_mean": 0.2198854166666667,
+  "placebo_sd": 0.01703886170375598,
+  "diff": -0.07821875000000003,
+  "p_one_sided": 1.0,
+  "detectable_diff": 0.04259715425938995,
+  "pool_n": 2854,
+  "placebo_q05": 0.19166666666666668,
+  "placebo_q95": 0.24791666666666667
+ },
+ "sensitivity_threshold": {
+  "-0.2": {
+   "threshold": -0.2,
+   "n_flagged": 480,
+   "n_loss_flagged": 107,
+   "rate_flagged": 0.22291666666666668,
+   "placebo_mean": 0.32410791666666666,
+   "placebo_sd": 0.018994339064391148,
+   "diff": -0.10119124999999998,
+   "p_one_sided": 1.0,
+   "detectable_diff": 0.04748584766097787,
+   "pool_n": 2854,
+   "placebo_q05": 0.29375,
+   "placebo_q95": 0.35625
+  },
+  "-0.4": {
+   "threshold": -0.4,
+   "n_flagged": 480,
+   "n_loss_flagged": 40,
+   "rate_flagged": 0.08333333333333333,
+   "placebo_mean": 0.1482675,
+   "placebo_sd": 0.01472797930150486,
+   "diff": -0.06493416666666667,
+   "p_one_sided": 1.0,
+   "detectable_diff": 0.03681994825376215,
+   "pool_n": 2854,
+   "placebo_q05": 0.125,
+   "placebo_q95": 0.17291666666666666
+  }
+ },
+ "sensitivity_complete_windows": {
+  "threshold": -0.3,
+  "n_flagged": 460,
+  "n_loss_flagged": 67,
+  "rate_flagged": 0.14565217391304347,
+  "placebo_mean": 0.21567739130434785,
+  "placebo_sd": 0.017268099657591133,
+  "diff": -0.07002521739130438,
+  "p_one_sided": 1.0,
+  "detectable_diff": 0.04317024914397783,
+  "pool_n": 2633,
+  "placebo_q05": 0.18695652173913044,
+  "placebo_q95": 0.24347826086956523
+ },
+ "sensitivity_strict_flag": {
+  "threshold": -0.3,
+  "n_flagged": 36,
+  "n_loss_flagged": 8,
+  "rate_flagged": 0.2222222222222222,
+  "placebo_mean": 0.23430555555555557,
+  "placebo_sd": 0.06745926411409196,
+  "diff": -0.012083333333333363,
+  "p_one_sided": 0.6336732653469306,
+  "detectable_diff": 0.16864816028522991,
+  "pool_n": 2854,
+  "placebo_q05": 0.1388888888888889,
+  "placebo_q95": 0.3611111111111111
+ },
+ "within_departures": {
+  "threshold": -0.3,
+  "n_flagged": 480,
+  "n_nosale": 774,
+  "rate_flagged": 0.14166666666666666,
+  "rate_nosale": 0.17571059431524547,
+  "diff": -0.0340439276485788,
+  "ci95": [
+   -0.07710930318647936,
+   0.008436014733504844
+  ]
+ },
+ "within_departures_t20": {
+  "threshold": -0.2,
+  "n_flagged": 480,
+  "n_nosale": 774,
+  "rate_flagged": 0.22291666666666668,
+  "rate_nosale": 0.28294573643410853,
+  "diff": -0.06002906976744185,
+  "ci95": [
+   -0.11135803611883091,
+   -0.009398175919351567
+  ]
+ },
+ "within_departures_t40": {
+  "threshold": -0.4,
+  "n_flagged": 480,
+  "n_nosale": 774,
+  "rate_flagged": 0.08333333333333333,
+  "rate_nosale": 0.10077519379844961,
+  "diff": -0.017441860465116282,
+  "ci95": [
+   -0.0534513073165181,
+   0.021942471937975192
+  ]
+ }
+}

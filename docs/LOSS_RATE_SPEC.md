@@ -1,5 +1,7 @@
 # Large-loss-rate test (registered 2026-11-04, before any outcome was computed)
 
+**Numbering.** In the project's stage numbering this is **Stage 10**. It was registered and run on 2026-11-04 and first labelled Stage 9, before the held-out 2025 confirmation (`docs/STAGE9_SPEC.md`) took that number.
+
 **Status:** REGISTERED. Written after Stages 1-5 and after counts of the sample (not outcomes) were seen; no loss rate has been computed. Exploratory follow-up to a null average effect.
 
 ## Question

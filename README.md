@@ -124,7 +124,9 @@ sequenceDiagram
 | 5 | Is the pattern stronger where segment reporting is opaque? (exploratory; see `docs/STAGE5_SPEC.md`) | A language model scores each 10-K's transparency (0 to 5, blind to returns); reliability gate against a hand audit; four tests of low versus high transparency (T1-T4) | Null: H5 not supported, all four Holm-adjusted p = 1.0 |
 | 6 | Same hypothesis, on individual CEO insider sales (50,123 sale-days, 4,176 of them guide-sell-leave; see `docs/STAGE6_SPEC.md`) | Avoided loss after each sale (four-factor abnormal return with pre-sale betas) with transparency interacted with guided and left; the specification was fixed before any outcome was computed | Null: coefficient +0.27 (standard error 1.69; smallest detectable effect 4.2 points per standard deviation of transparency) |
 | 7 | Do between-firm variation and the original treatment add power? (exploratory re-analysis of the Stage 6 sales; see `docs/STAGE7_SPEC.md`) | Industry-by-month fixed effects (P7a), then abrupt exits and non-routine sales (P7b), Holm over the two; power printed before the estimates | Null: industry effects added no power (standard error 1.78 against 1.69), the restrictions cost power (smallest detectable effect 9.0 against 4.2); Holm-adjusted p = 1.0 for both |
-| 9 | Do guide-sell-leave firms suffer large losses more often? (registered 2026-11-04, so it ran before Stage 6; see `docs/LOSS_RATE_SPEC.md`) | Share of firms with a 12-month market-adjusted return below -30 points, flagged (480: guided, sold, left before the guidance came due) vs placebo groups and vs guided firms with no sale; threshold fixed before any outcome | Null, opposite sign: flagged 14.2% vs placebo 22.0% and vs no-sale 17.6% (-3.4 points, CI -7.7 to +0.8); smallest detectable difference 4.3 points |
+| 8 | Does opacity change what insiders avoid, on all officers and directors? (the mechanism, with the exit condition dropped; see `docs/STAGE8_SPEC.md`) | Avoided loss after 204,174 insider sale-days on the transparency score, industry and year-quarter effects, errors clustered by firm and quarter; power printed first | Null: coefficient -0.129 (SE 0.152, one-sided p 0.199); smallest detectable effect 0.38 points per SD of transparency; none of 15 secondary checks significant at two-sided 5% |
+| 9 | Does the Stage 8 result hold on data not yet seen? (held-out 2025 insider sales, 6,690 sale-days; see `docs/STAGE9_SPEC.md`) | The same single Stage 8 regression, firm-clustered errors, estimated once on 2025-01 to 2025-09 | Null: coefficient -0.202 (SE 0.730, one-sided p 0.391); smallest detectable effect 1.82 points per SD; consistent with Stage 8 but cannot confirm or refute it; the two subgroup leads (large firms, transparency x guidance) are not findings |
+| 10 | Do guide-sell-leave firms suffer large losses more often? (registered 2026-11-04, so it ran before Stage 6; see `docs/LOSS_RATE_SPEC.md`) | Share of firms with a 12-month market-adjusted return below -30 points, flagged (480: guided, sold, left before the guidance came due) vs placebo groups and vs guided firms with no sale; threshold fixed before any outcome | Null, opposite sign: flagged 14.2% vs placebo 22.0% and vs no-sale 17.6% (-3.4 points, CI -7.7 to +0.8); smallest detectable difference 4.3 points |
 
 ## Repository map
 
@@ -140,7 +142,7 @@ docs/
   STAGE6_SPEC.md           Stage 6 design, fixed before any sale-level outcome was computed
   STAGE7_SPEC.md           Stage 7 design (exploratory re-analysis), fixed before any Stage 7 regression, with its results
   STAGE8_SPEC.md           Stage 8 design (opacity mechanism on all officers and directors), fixed before any Stage 8 outcome, with its results
-  LOSS_RATE_SPEC.md        Stage 9 (large-loss-rate test): the registered design, then its result
+  LOSS_RATE_SPEC.md        Stage 10 (large-loss-rate test): the registered design, then its result
   STAGE9_SPEC.md           Stage 9 design (held-out confirmation on 2025 sales), fixed before any 2025 return, with its results
   MEMO_TEMPLATE.md         prose of MEMO.md with {{TABLE:name}} placeholders
   MEMO_chronological_2026-10-24.md   the earlier, stage-by-stage memo (kept for reference)
@@ -164,7 +166,7 @@ src/                       all Python (flat; run scripts from the repo root)
   gg_stage6.py             Stage 6: CEO sale-days, guidance flags, abnormal returns after each sale, primary regression, power simulation
   gg_stage7.py             Stage 7: exit announcements with abruptness class, routine versus opportunistic sale rule, two-digit industry codes
   gg_stage8.py             Stage 8: officer and director sale-days, date-valid CUSIP and gvkey links, mechanism regression and power simulation
-  gg_lossrate.py           Stage 9: share of firms with a large 12-month loss, flagged vs placebo groups and vs guided firms with no sale
+  gg_lossrate.py           Stage 10: share of firms with a large 12-month loss, flagged vs placebo groups and vs guided firms with no sale
   gg_crsp_ciz.py           CRSP v2 (CIZ) names and returns converted to the project layout; new name rows win; overlap check
 tests/
   test_gg.py               unit tests + simulations (planted-effect recovery, false-positive rate, power)
@@ -172,7 +174,7 @@ tests/
   test_gg6.py              Stage 6 tests (sale-days, guidance timing, abnormal returns with no look-ahead, regressions, power)
   test_gg7.py              Stage 7 tests (exit timing and abruptness, routine-sale rule with no look-ahead, industry codes, industry-effects regression)
   test_gg8.py              Stage 8 tests (role groups, date-valid links, sale-day building, mechanism regression and power)
-  test_gg_lossrate.py      Stage 9 tests (flag logic, BHAR arithmetic, planted-effect placebo test, within-departure comparator)
+  test_gg_lossrate.py      Stage 10 tests (flag logic, BHAR arithmetic, planted-effect placebo test, within-departure comparator)
   test_gg_ciz.py           CRSP v2 conversion tests (columns, types, name-merge priority, overlap report)
 notebooks/
   guide_and_go_analysis.ipynb   results notebook (generated)

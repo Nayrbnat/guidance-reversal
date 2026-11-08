@@ -142,6 +142,7 @@ docs/
   STAGE8_SPEC.md           Stage 8 design (opacity mechanism on all officers and directors), fixed before any Stage 8 outcome, with its results
   LOSS_RATE_SPEC.md        Stage 9 (large-loss-rate test): the registered design, then its result
   STAGE9_SPEC.md           Stage 9 design (held-out confirmation on 2025 sales), fixed before any 2025 return, with its results
+  STAGE10_SPEC.md          Stage 10 pre-registration (large-firm lead on unseen sales; not run, waiting for 2026 prices and sample size)
   MEMO_TEMPLATE.md         prose of MEMO.md with {{TABLE:name}} placeholders
   MEMO_chronological_2026-10-24.md   the earlier, stage-by-stage memo (kept for reference)
 src/                       all Python (flat; run scripts from the repo root)

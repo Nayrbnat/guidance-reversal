@@ -142,6 +142,7 @@ docs/
   STAGE8_SPEC.md           Stage 8 design (opacity mechanism on all officers and directors), fixed before any Stage 8 outcome, with its results
   LOSS_RATE_SPEC.md        Stage 9 (large-loss-rate test): the registered design, then its result
   STAGE9_SPEC.md           Stage 9 design (held-out confirmation on 2025 sales), fixed before any 2025 return, with its results
+  STAGE10_SPEC.md          Stage 10 pre-registration (large-firm lead on unseen sales; not run, waiting for 2026 prices and sample size)
   MEMO_TEMPLATE.md         prose of MEMO.md with {{TABLE:name}} placeholders
   MEMO_chronological_2026-10-24.md   the earlier, stage-by-stage memo (kept for reference)
 src/                       all Python (flat; run scripts from the repo root)
@@ -198,6 +199,7 @@ scripts/run_stage8.py      Stage 8: the mechanism test on all officers and direc
 scripts/pull_crsp_2025.py  Stage 9: pull CRSP v2 names and 2023-2025 returns and the factors through the REST API (new cache files only)
 scripts/phases_2025.py     Stage 9: extend phases to 2025 filings, refusing to write if any existing filing changes
 scripts/run_stage9.py      Stage 9: the held-out 2025 test (power first, one primary test) and the exploratory walk-forward
+scripts/se_bakeoff_stage8.py Stage 10: standard-error-only comparison of design variants (no coefficients printed or saved)
 scripts/memo_tables.py, build_memo.py   regression tables from the result files, and the memo built from them
 .env                       WRDS credentials (never commit or share)
 ```

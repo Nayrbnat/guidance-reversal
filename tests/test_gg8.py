@@ -115,6 +115,15 @@ def test_mechanism_regression():
     check("rows with a missing outcome are dropped, not zero-filled", S8.run_mechanism(_sim().assign(Y63=lambda x: x.Y63.where(x.index % 2 == 0)), "Y63", controls=CTRL)["n"] < len(_sim()))
 
 
+def test_one_way_clustering():
+    import gg_stage8 as S8
+    d = _sim(effect=-1.0, seed=7)
+    two = S8.run_mechanism(d, "Y63", controls=CTRL)
+    one = S8.run_mechanism(d, "Y63", controls=CTRL, two_way=False)
+    check("one-way (firm) clustering runs and returns the same coefficient as two-way", abs(one["Z"]["coef"] - two["Z"]["coef"]) < 1e-9, str((one["Z"]["coef"], two["Z"]["coef"])))
+    check("one-way clustering gives a different standard error (the quarter term is dropped)", abs(one["Z"]["se"] - two["Z"]["se"]) > 1e-9, str((one["Z"]["se"], two["Z"]["se"])))
+
+
 def test_mechanism_power():
     import gg_stage8 as S8
     d = _sim(n_firms=40, n_q=16, per=4, seed=5)
@@ -129,6 +138,7 @@ def main():
     test_role_group()
     test_sale_days()
     test_mechanism_regression()
+    test_one_way_clustering()
     test_mechanism_power()
     print(f"\n{len(FAILS)} failures {FAILS}")
     return len(FAILS)

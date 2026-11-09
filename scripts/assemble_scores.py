@@ -29,17 +29,18 @@ for line in (OUT / "current_hashes.jsonl").read_text(encoding="utf-8").splitline
 ps = R.choose_reads(rd, cur, st, freeze["config_hash"])                    # the read on the current text, never the highest score
 (OUT / "stale_or_missing_units.json").write_text(json.dumps(ps.loc[ps["status"].isin(["stale_input", "not_scored"]), "accession"].tolist()), encoding="utf-8")
 
-EXT = len(sys.argv) > 1 and sys.argv[1] == "--extension"     # python scripts/assemble_scores.py --extension : writes stage5_scores_2025.pkl, never the original
-pt = pd.read_csv(G.CACHE / ("phase_table_2025.csv" if EXT else "phase_table.csv"), dtype={"gvkey": str, "accession": str, "phase_first": str})
+EXT2 = len(sys.argv) > 1 and sys.argv[1] == "--extension2026"      # builds on the 2025 extension; writes stage5_scores_2026.pkl
+EXT = len(sys.argv) > 1 and sys.argv[1] in ("--extension", "--extension2026")     # python scripts/assemble_scores.py --extension : writes stage5_scores_2025.pkl, never the original
+pt = pd.read_csv(G.CACHE / ("phase_table_2026.csv" if EXT2 else "phase_table_2025.csv" if EXT else "phase_table.csv"), dtype={"gvkey": str, "accession": str, "phase_first": str})
 sc = R.scores_from_phases(pt, ps)
 if EXT:
-    old = pd.read_pickle(G.DATA / "stage5_scores.pkl").set_index("accession")
+    old = pd.read_pickle(G.DATA / ("stage5_scores_2025.pkl" if EXT2 else "stage5_scores.pkl")).set_index("accession")
     chk = sc.set_index("accession").join(old[["t_final"]], rsuffix="_old", how="inner")
     diff = chk[(chk["t_final"].fillna(-1) != chk["t_final_old"].fillna(-1))]
     print(f"existing filings {len(chk)}, scores changed by the extension: {len(diff)}")
     if len(diff):
         sys.exit("REFUSED: the extension changed an existing score; not writing")
-    sc.to_pickle(G.DATA / "stage5_scores_2025.pkl")
+    sc.to_pickle(G.DATA / ("stage5_scores_2026.pkl" if EXT2 else "stage5_scores_2025.pkl"))
 else:
     sc.to_pickle(G.DATA / "stage5_scores.pkl")
 firsts = pt["phase_first"].nunique()

@@ -1,0 +1,14 @@
+{
+ "reason": "Compustat validation failed the spec's bar (corr >= 0.99 and share within 0.001 >= 0.95)",
+ "n": 526735,
+ "share_within": 0.9893969453330422,
+ "corr": 0.9883123107077474,
+ "p99_abs_diff": 0.0014823799555676402,
+ "max_abs_diff": 1.166375418604651,
+ "lmcap_abs_diff_median": 0.0,
+ "lmcap_abs_diff_p95": 0.01458997266044193,
+ "by_year_share_within": {
+  "2024": 0.9893433353437877,
+  "2025": 0.9894513396186724
+ }
+}

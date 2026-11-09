@@ -145,6 +145,7 @@ docs/
   LOSS_RATE_SPEC.md        Stage 10 (large-loss-rate test): the registered design, then its result
   STAGE9_SPEC.md           Stage 9 design (held-out confirmation on 2025 sales), fixed before any 2025 return, with its results
   STAGE10_SPEC.md          Stage 10 pre-registration (large-firm lead on unseen sales; not run, waiting for 2026 prices and sample size)
+  STAGE13_SPEC.md          Stage 13 (wider sale condition for the flag: a sale from 9 months before the latest guidance to the announcement), registered before any outcome
   MEMO_TEMPLATE.md         prose of MEMO.md with {{TABLE:name}} placeholders
   MEMO_chronological_2026-10-24.md   the earlier, stage-by-stage memo (kept for reference)
 src/                       all Python (flat; run scripts from the repo root)
@@ -167,6 +168,7 @@ src/                       all Python (flat; run scripts from the repo root)
   gg_stage6.py             Stage 6: CEO sale-days, guidance flags, abnormal returns after each sale, primary regression, power simulation
   gg_stage7.py             Stage 7: exit announcements with abruptness class, routine versus opportunistic sale rule, two-digit industry codes
   gg_stage8.py             Stage 8: officer and director sale-days, date-valid CUSIP and gvkey links, mechanism regression and power simulation
+  gg_stage13.py            Stage 13: sale value in the wider window and the new flag columns (original columns never overwritten)
   gg_lossrate.py           Stage 10: share of firms with a large 12-month loss, flagged vs placebo groups and vs guided firms with no sale
   gg_crsp_ciz.py           CRSP v2 (CIZ) names and returns converted to the project layout; new name rows win; overlap check
 tests/
@@ -175,6 +177,7 @@ tests/
   test_gg6.py              Stage 6 tests (sale-days, guidance timing, abnormal returns with no look-ahead, regressions, power)
   test_gg7.py              Stage 7 tests (exit timing and abruptness, routine-sale rule with no look-ahead, industry codes, industry-effects regression)
   test_gg8.py              Stage 8 tests (role groups, date-valid links, sale-day building, mechanism regression and power)
+  test_gg13.py             Stage 13 tests (window sums and boundaries, new flag columns, old flag untouched)
   test_gg_lossrate.py      Stage 10 tests (flag logic, BHAR arithmetic, planted-effect placebo test, within-departure comparator)
   test_gg_ciz.py           CRSP v2 conversion tests (columns, types, name-merge priority, overlap report)
 notebooks/
@@ -201,6 +204,8 @@ scripts/run_stage8.py      Stage 8: the mechanism test on all officers and direc
 scripts/pull_crsp_2025.py  Stage 9: pull CRSP v2 names and 2023-2025 returns and the factors through the REST API (new cache files only)
 scripts/phases_2025.py     Stage 9: extend phases to 2025 filings, refusing to write if any existing filing changes
 scripts/run_stage9.py      Stage 9: the held-out 2025 test (power first, one primary test) and the exploratory walk-forward
+scripts/count_stage13.py     Stage 13: counts only, how many events the wider sale condition adds (no returns)
+scripts/run_stage13.py       Stage 13: the Stage 1 tests rerun on the new flag (a flag-swapped copy of gg_study.py; S3 dropped)
 scripts/se_bakeoff_stage8.py Stage 10: standard-error-only comparison of design variants (no coefficients printed or saved)
 scripts/memo_tables.py, build_memo.py   regression tables from the result files, and the memo built from them
 .env                       WRDS credentials (never commit or share)

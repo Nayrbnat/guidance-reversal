@@ -7,7 +7,7 @@ step() { echo "[$(date +%H:%M:%S)] $*" | tee -a "$LOG"; }
 fail() { step "FAILED at: $*"; exit 1; }
 
 step "waiting for the insider stream and the Compustat price pull"
-until [ -f gg_cache/tr_insiders_2025_06_plus.pkl ] && [ -f outputs/results/secd_vs_crsp.json ]; do sleep 60; done
+until [ -f gg_cache/tr_insiders_2025_06_plus.pkl ] && [ -f outputs/results/secd_vs_crsp_v2.json ]; do sleep "${STAGE10_POLL:-60}"; done
 step "pulls finished"
 
 step "prep (validation gate, linking, CRSP for new firms, splice, filings list)"

@@ -39,7 +39,8 @@ pr = (m.prc_s.abs() / m.prc_c.abs() - 1).abs().replace([np.inf, -np.inf], np.nan
 rep["price_share_within_0.1pct"] = float((pr <= 0.001).mean())
 lm = (np.log(m.prc_s.abs() * m.shrout_s * 1000) - np.log(m.prc_c.abs() * m.shrout_c * 1000)).replace([np.inf, -np.inf], np.nan).dropna()
 rep["lmcap_abs_diff_median"], rep["lmcap_abs_diff_p95"] = float(lm.abs().median()), float(lm.abs().quantile(0.95))
-rep["gate_passed"] = bool(rep["corr"] >= 0.99 and rep["share_within"] >= 0.95)
+import gg_stage10 as S10
+rep["gate_passed"] = S10.gate_passed(rep)
 print(json.dumps(rep, indent=1), flush=True)
 (G.RESULTS / "secd_vs_crsp_v2.json").write_text(json.dumps(rep, indent=1), encoding="utf-8")
 print("GATE", "PASSED" if rep["gate_passed"] else "FAILED", flush=True)

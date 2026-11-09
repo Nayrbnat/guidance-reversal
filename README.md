@@ -168,6 +168,7 @@ src/                       all Python (flat; run scripts from the repo root)
   gg_stage7.py             Stage 7: exit announcements with abruptness class, routine versus opportunistic sale rule, two-digit industry codes
   gg_stage8.py             Stage 8: officer and director sale-days, date-valid CUSIP and gvkey links, mechanism regression and power simulation
   gg_compustat_px.py       Compustat daily prices to returns (split-adjusted, total-return factor), one issue per CRSP security, CRSP splice, overlap validation
+  gg_stage10.py            Stage 10 interim-run logic as tested functions: validation gate, universe restriction, per-test samples, Holm, filing chain, extension refusal checks
   gg_lossrate.py           Stage 10: share of firms with a large 12-month loss, flagged vs placebo groups and vs guided firms with no sale
   gg_crsp_ciz.py           CRSP v2 (CIZ) names and returns converted to the project layout; new name rows win; overlap check
 tests/
@@ -177,6 +178,7 @@ tests/
   test_gg7.py              Stage 7 tests (exit timing and abruptness, routine-sale rule with no look-ahead, industry codes, industry-effects regression)
   test_gg8.py              Stage 8 tests (role groups, date-valid links, sale-day building, mechanism regression and power)
   test_gg_secd.py          Compustat price converter tests (splits, dividends, gaps, issue choice, splice)
+  test_gg10.py             Stage 10 machinery tests (gate, universe, samples, Holm, filings, refusal checks) and the chain script run against a fake uv
   test_gg_lossrate.py      Stage 10 tests (flag logic, BHAR arithmetic, planted-effect placebo test, within-departure comparator)
   test_gg_ciz.py           CRSP v2 conversion tests (columns, types, name-merge priority, overlap report)
 notebooks/

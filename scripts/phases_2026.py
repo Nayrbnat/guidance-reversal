@@ -41,11 +41,12 @@ if out.exists():
 pt = R.phase_table(lab, tri)
 pt["gvkey"] = pt["gvkey"].astype(str).str.zfill(6)
 prev = pd.read_csv(C / "phase_table_2025.csv", dtype={"gvkey": str, "accession": str, "phase_first": str}).set_index("accession")
-m = pt.set_index("accession").join(prev[["level", "phase", "phase_first"]], rsuffix="_old", how="inner")
-bad = m[(m.level != m.level_old) | (m.phase != m.phase_old) | (m.phase_first != m.phase_first_old)]
+import gg_stage10 as S10
+bad = S10.changed_phases(pt, prev.reset_index())
+m = prev
 print(f"previously existing filings: {len(m)}, changed by the extension: {len(bad)}", flush=True)
 if len(bad):
-    print(bad.head(10).to_string())
+    print(bad[:10])
     sys.exit("REFUSED: the extension changed an existing filing's phase; not writing")
 pt.to_csv(C / "phase_table_2026.csv", index=False)
 fresh = pt[~pt.accession.isin(prev.index)]

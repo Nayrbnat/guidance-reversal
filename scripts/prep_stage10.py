@@ -19,6 +19,7 @@ import gg_compustat_px as P
 import gg_crsp_ciz as C
 import gg_stage5 as S5
 import gg_stage8 as S8
+import gg_stage10 as S10
 
 START, END = "2025-01-01", "2026-06-30"
 last = lambda p: sorted(glob.glob(str(G.CACHE / p)))[-1]
@@ -26,7 +27,7 @@ last = lambda p: sorted(glob.glob(str(G.CACHE / p)))[-1]
 # 1. the validation gate, fixed in the spec before any 2026 data was touched
 v = json.loads((G.RESULTS / "secd_vs_crsp_v2.json").read_text())      # Amendment 2: one issue per CRSP security, validated on 2025 out of sample
 print("VALIDATION Compustat-built vs CRSP v2 returns:", {k: v.get(k) for k in ("n", "corr", "share_within", "p99_abs_diff", "max_abs_diff")}, flush=True)
-if not (v["corr"] >= 0.99 and v["share_within"] >= 0.95):
+if not S10.gate_passed(v):
     (G.RESULTS / "stage10_cancelled.json").write_text(json.dumps({"reason": "Compustat validation failed the spec's bar (corr >= 0.99 and share within 0.001 >= 0.95)", **v}, indent=1))
     sys.exit("CANCELLED: the Compustat price route failed validation; Stage 10 is not run (spec Amendments 1 and 2).")
 print("  gate passed", flush=True)
@@ -42,8 +43,7 @@ for df in (old, new):
 a = old[(old.trancode == "S") & (old.trandate.between("2025-06-01", "2025-12-31"))]
 b = new[(new.trancode == "S") & (new.trandate.between("2025-06-01", "2025-12-31"))]
 print(f"CONSISTENCY 2025-06..12 sales rows: cached {len(a):,}, streamed {len(b):,} (cleanse flag in streamed: {new.cleanse.value_counts(dropna=False).head(4).to_dict()})", flush=True)
-universe = set(old.cusip6)                                              # the cached file covers the original firm universe; keep 2026 to the same firms
-add = new[(new.trandate >= "2026-01-01") & new.cleanse.isin(["R", "H"]) & new.cusip6.isin(universe)]
+add = S10.restrict_universe(new, set(old.cusip6))                        # the cached file covers the original firm universe; keep 2026 to the same firms
 ins = pd.concat([old, add[[c for c in old.columns if c in add.columns]]], ignore_index=True)
 ins.to_pickle(G.CACHE / "tr_insiders_combined_2026.pkl")
 print(f"2026 rows added: {len(add):,} (sales {int((add.trancode == 'S').sum()):,}); latest trade date {add.trandate.max().date()}", flush=True)
@@ -101,23 +101,12 @@ idx = pd.read_pickle(G.CACHE / "filing_index_stage5.pkl")
 x = S5.attach_T(d, scores, idx, meta, date_col="trandate", strict=True)
 print("T coverage of the new window with current scores:", int(x["T"].notna().sum()), "of", len(x), "| reasons", x["T_missing_reason"].value_counts().to_dict(), flush=True)
 tk = idx[idx.form.isin(["10-K", "10-K405"])].copy()
-tk["filing_date"] = pd.to_datetime(tk.filing_date).astype("datetime64[ns]")
-tk["gvkey"] = tk.gvkey.astype(str).str.zfill(6)
 ns = x[x.T_missing_reason == "not_scored"][["gvkey", "trandate"]].copy()
-ns["trandate"] = pd.to_datetime(ns.trandate).astype("datetime64[ns]")
-m = pd.merge_asof(ns.sort_values("trandate"), tk.sort_values("filing_date")[["gvkey", "filing_date", "accession"]], left_on="trandate", right_on="filing_date", by="gvkey", direction="backward", allow_exact_matches=False)
-firms = sorted(set(m.dropna(subset=["accession"]).gvkey))
 have = pd.concat([pd.read_csv(G.CACHE / "phase_needed_all.csv", dtype=str)])
 have["gvkey"] = have.gvkey.astype(str).str.zfill(6)
 last_have = have.groupby("gvkey").filing_date.max()
-rows = []
-for g in firms:
-    f = tk[(tk.gvkey == g) & (tk.filing_date <= END)]
-    if g in last_have.index:
-        f = f[f.filing_date > pd.Timestamp(last_have[g])]
-    rows.append(f)
-chain = pd.concat(rows).drop_duplicates("accession") if rows else tk.iloc[:0]
-chain = chain[~chain.accession.isin(have.accession)]
-chain[["gvkey", "accession", "filing_date", "cik", "url"]].to_csv(G.CACHE / "phase_needed_2026.csv", index=False)
+chain = S10.filings_to_label(ns, tk, last_have, set(have.accession), END)
+firms = chain.gvkey.unique()
+chain.to_csv(G.CACHE / "phase_needed_2026.csv", index=False)
 print(f"FILINGS to label for 2026: {len(chain)} from {chain.gvkey.nunique()} firms (unscored insider-days {len(ns)}, firms {len(firms)})", flush=True)
 print("PREP DONE", flush=True)

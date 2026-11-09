@@ -18,10 +18,12 @@ import gg_stage5 as S5
 import gg_stage6 as S6
 import gg_stage7 as S7
 import gg_stage8 as S8
+import gg_stage10 as S10
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--power-reps", type=int, default=30)
 ap.add_argument("--seed", type=int, default=0)
+ap.add_argument("--out", default=None, help="write the results here instead of outputs/results/stage10_results.json (used to check refactors)")
 a = ap.parse_args()
 t0 = time.time()
 CTRL = ["lmcap", "ret12", "lval", "V", "role_CEO", "role_CFO", "role_DIRECTOR"]
@@ -69,17 +71,7 @@ d["post2025"] = d["trandate"] > pd.Timestamp("2025-09-30")
 d.to_pickle(G.DATA / "stage10_panel.pkl")
 
 
-def sample(x):
-    """A test sample: complete cases, Y winsorised and V standardised on the sample itself (as the spec fixes)."""
-    b = x[x["Yraw"].notna() & x["Z"].notna() & x["vol"].notna() & x["sic2"].notna()].copy().reset_index(drop=True)
-    b["Y63"] = S3.wins(b["Yraw"])
-    b["V"] = (b["vol"] - b["vol"].mean()) / b["vol"].std()
-    return b
-
-
-pooled = sample(d)
-new_all = sample(d[d["trandate"] >= pd.Timestamp(NEW_FROM)])
-large = sample(d[(d["trandate"] >= pd.Timestamp(NEW_FROM)) & (d["lmcap"] >= LARGE)])
+pooled, new_all, large = S10.stage_samples(d, new_from=NEW_FROM, large_cut=LARGE)
 cover = {"linked": int(n_linked), "with_T": int(d["Z"].notna().sum()), "pooled": int(len(pooled)), "pooled_firms": int(pooled.gvkey.nunique()),
          "new_months_all": int(len(new_all)), "new_months_firms": int(new_all.gvkey.nunique()), "T_A_large_new": int(len(large)), "T_A_firms": int(large.gvkey.nunique()),
          "by_quarter_pooled": pooled.yq.value_counts().sort_index().to_dict(), "missing_T_reasons": d["T_missing_reason"].value_counts().to_dict(),
@@ -106,12 +98,7 @@ for name, df in (("T_A_large_new", large), ("T_B_pooled", pooled)):
     res[name] = {"power": {"se": se, "mde": mde, "sim": {str(round(k, 4)): v for k, v in pw.items()}, "reps": a.power_reps}}
 
 # ---------------------------------------------------------------- the two estimates and Holm
-ps = {k: est[k]["p_one"] for k in est}
-order = sorted(ps, key=ps.get)
-holm, run = {}, 0.0
-for i, k in enumerate(order):
-    run = max(run, min(1.0, (len(order) - i) * ps[k]))
-    holm[k] = run
+holm = S10.holm_adjust({k: est[k]["p_one"] for k in est})
 for k, r in est.items():
     z, se = r["Z"]["coef"], r["Z"]["se"]
     print(f"{k}: Z = {z:.3f} (se {se:.3f}), one-sided p {r['p_one']:.3f}, Holm-adjusted {holm[k]:.3f}, 90% interval [{z - 1.645 * se:.3f}, {z + 1.645 * se:.3f}], n {r['n']}", flush=True)
@@ -133,6 +120,6 @@ def clean(o):
     return o
 
 
-out = G.RESULTS / "stage10_results.json"
+out = Path(a.out) if a.out else G.RESULTS / "stage10_results.json"
 out.write_text(json.dumps(clean(res), indent=1), encoding="utf-8")
 print("wrote", out, f"({(time.time() - t0) / 60:.1f} min)", flush=True)

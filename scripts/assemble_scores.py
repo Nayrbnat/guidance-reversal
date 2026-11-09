@@ -35,9 +35,9 @@ pt = pd.read_csv(G.CACHE / ("phase_table_2026.csv" if EXT2 else "phase_table_202
 sc = R.scores_from_phases(pt, ps)
 if EXT:
     old = pd.read_pickle(G.DATA / ("stage5_scores_2025.pkl" if EXT2 else "stage5_scores.pkl")).set_index("accession")
-    chk = sc.set_index("accession").join(old[["t_final"]], rsuffix="_old", how="inner")
-    diff = chk[(chk["t_final"].fillna(-1) != chk["t_final_old"].fillna(-1))]
-    print(f"existing filings {len(chk)}, scores changed by the extension: {len(diff)}")
+    import gg_stage10 as S10
+    diff = S10.changed_scores(sc, old.reset_index())
+    print(f"existing filings {len(old)}, scores changed by the extension: {len(diff)}")
     if len(diff):
         sys.exit("REFUSED: the extension changed an existing score; not writing")
     sc.to_pickle(G.DATA / ("stage5_scores_2026.pkl" if EXT2 else "stage5_scores_2025.pkl"))

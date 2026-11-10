@@ -32,7 +32,7 @@ t0 = time.time()
 mins = lambda: f"{(time.time() - t0) / 60:.1f} min"
 RES = G.RESULTS
 
-# ------------------------------------------------------------------ sample: the Stage 10 flag on eligible departures, with 12-month return windows
+# ------------------------------------------------------------------ sample: the Stage 15 flag on eligible departures, with 12-month return windows
 ev = LR.flags(GV.load_eligible_events(2004, 2025, "validation/candidate_labels.csv"))
 db = G.WRDS(refresh=False)
 crsp, mkt, _ = G.load_crsp(db, ev.permno.unique(), 2004, 2025)

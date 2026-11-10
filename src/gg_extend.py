@@ -1,4 +1,4 @@
-"""gg_extend.py -- extend the daily returns and the market series through 2025-12-31 (Stage 1W Amendment 1 and the Stage 10, 12 and 12b reruns).
+"""gg_extend.py -- extend the daily returns and the market series through 2025-12-31 (Stage 1W Amendment 1 and the Stage 15, 12 and 12b reruns).
 
 The legacy CRSP daily file and the market index in the main cache stop on 2024-12-31 on this account. The CRSP v2 daily file
 (`gg_cache/ciz_dsf_2023_2025.pkl`, through 2025-12-31, delisting returns included, already in the project layout) covers 2025. For the market

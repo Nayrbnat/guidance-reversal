@@ -25,7 +25,7 @@ You can run the unit tests with no accounts. **Rebuilding the data and results n
 | **Core libraries** | `numpy`, `pandas`, `scipy`, `statsmodels`, `patsy`, `scikit-learn`, `matplotlib`, `requests`, `sqlalchemy`, `psycopg2-binary`, `python-dotenv` | Installed by the setup script |
 | Optional: notebook | `nbformat`, `nbconvert`, `ipykernel` | Regenerate and run `notebooks/guide_and_go_analysis.ipynb` |
 | Optional: Stage 12b | `xgboost` (`uv sync --extra ml`) | The XGBoost model in `src/gg_stage12.py` |
-| Returns after 2024 | The CRSP **v2** daily file (`crsp.dsf_v2`, through 2025-12-31), cached by `scripts/pull_crsp_2025.py`. On the account used here the legacy daily file stops on 2024-12-31 and WRDS had no 2026 CRSP rows on 2026-11-09 | `src/gg_extend.py` (the `--extend` option of Stages 1W, 5W, 10, 12 and 12b) |
+| Returns after 2024 | The CRSP **v2** daily file (`crsp.dsf_v2`, through 2025-12-31), cached by `scripts/pull_crsp_2025.py`. On the account used here the legacy daily file stops on 2024-12-31 and WRDS had no 2026 CRSP rows on 2026-11-09 | `src/gg_extend.py` (the `--extend` option of Stages 1W, 5W, 12, 12b and 15) |
 | Optional: legacy search | `sentence-transformers`, `anthropic` | Only the old semantic-search layer; **not used for any result** |
 | Stage 5 only (exploratory) | The **WRDS SEC filings index** (`wrdssec`) to find each firm's 10-Ks, an SEC contact address in the `SEC_CONTACT_EMAIL` environment variable for filing downloads, the optional `stage5` extras (`uv sync --extra stage5`), and the **Claude Code CLI** logged in (the transparency scorer calls `claude -p` with a Claude Haiku model; no API key is stored) | `src/gg_filings.py`, `src/gg_transparency.py`, `src/gg_stage5.py` |
 | **Annotators** (people or models, blind to returns) | The abrupt-exit labels for candidate events | The annotation step in the pipeline; the annotator files are not in this repository, so you need your own annotation pass to reproduce the flag |
@@ -134,20 +134,21 @@ sequenceDiagram
 | 7 | Do between-firm variation and the original treatment add power? (exploratory re-analysis of the Stage 6 sales; see `docs/STAGE7_SPEC.md`) | Industry-by-month fixed effects (P7a), then abrupt exits and non-routine sales (P7b), Holm over the two; power printed before the estimates | Null: industry effects added no power (standard error 1.78 against 1.69), the restrictions cost power (smallest detectable effect 9.0 against 4.2); Holm-adjusted p = 1.0 for both |
 | 8 | Does opacity change what insiders avoid, on all officers and directors? (the mechanism, with the exit condition dropped; see `docs/STAGE8_SPEC.md`) | Avoided loss after 204,174 insider sale-days on the transparency score, industry and year-quarter effects, errors clustered by firm and quarter; power printed first | Null: coefficient -0.129 (SE 0.152, one-sided p 0.199); smallest detectable effect 0.38 points per SD of transparency; none of 15 secondary checks significant at two-sided 5% |
 | 9 | Does the Stage 8 result hold on data not yet seen? (held-out 2025 insider sales, 6,690 sale-days; see `docs/STAGE9_SPEC.md`) | The same single Stage 8 regression, firm-clustered errors, estimated once on 2025-01 to 2025-09 | Null: coefficient -0.202 (SE 0.730, one-sided p 0.391); smallest detectable effect 1.82 points per SD; consistent with Stage 8 but cannot confirm or refute it; the two subgroup leads (large firms, transparency x guidance) are not findings |
-| 10 | Do guide-sell-leave firms suffer large losses more often? (registered 2026-11-04, so it ran before Stage 6; see `docs/LOSS_RATE_SPEC.md`) | Share of firms with a 12-month market-adjusted return below -30 points, flagged (480: guided, sold, left before the guidance came due) vs placebo groups and vs guided firms with no sale; threshold fixed before any outcome | Null, opposite sign: flagged 14.2% vs placebo 22.0% and vs no-sale 17.6% (-3.4 points, CI -7.7 to +0.8); smallest detectable difference 4.3 points |
+| 10 | Stage 10 pre-registration: the large-firm lead on unseen sales (`docs/STAGE10_SPEC.md`) | Pooled and large-firm tests on sales from 2025-01 to 2026-06 (interim run) | Null on both tests (see the spec) |
 | 1W | Stage 1 re-run on the **widened flag** (exploratory; see `docs/STAGE1W_SPEC.md`): guided in the prior 365 days, a sale after the first of those releases, a guided period ends after the exit, no abruptness test | Calendar-time four-factor alpha, placebo-portfolio p (2,000 draws), eight Holm-corrected variants; returns through 2025 | Null: 492 firms, +2.6% a year (t = +1.65), placebo p 0.80; variants +0.1% to +2.9%, none significant; smallest detectable underperformance about 5% a year. The flag was widened after the strict flag was null |
 | 5W | Stage 5 test T1 (low versus high transparency) on the widened flag (exploratory; see `docs/STAGE5W_SPEC.md`) | Low-minus-high excess alpha, placebo p; the Stage 5 viability rule failed (placebo pool under five times the flagged group) and was waived | Null, wrong sign for H5: +0.023 (95% interval -0.030 to +0.075), one-sided p 0.66 |
-| 10b | Stage 10 pre-registration: the large-firm lead on unseen sales (`docs/STAGE10_SPEC.md`; it shares the number 10 with the large-loss test above) | Pooled and large-firm tests on sales from 2025-01 to 2026-06 (interim run) | Null on both tests (see the spec) |
 | 11 | Can methods built for low power find a hidden effect? (see `docs/STAGE11_SPEC.md`; the literature review is `docs/METHODS_NOTES_POWER.md`) | Higher criticism and a positive Cauchy combination on event-level p-values, Bayes factors and non-inferiority tests, regression calibration of the noisy transparency score, the reaction to the first post-exit guidance | Null: nothing found (both formal tests Holm p = 1.0, pointing the wrong way); calibration moves the Stage 8 estimate from -0.13 to -0.16, interval still includes zero |
 | 12 | Does a model trained on the past predict large losses better when given the pattern's ingredients? (see `docs/STAGE12_SPEC.md`) | Rolling windows (train five years, skip a year, test 2010-2024), gradient boosting and logistic regression, permutation test; returns through 2025 | Not supported: AUC change -0.015 (95% interval -0.035 to +0.013), permutation p 0.87 |
 | 12b | Does that hold across model families and a streamlined feature set? (exploratory; see `docs/STAGE12B_SPEC.md`) | XGBoost, a three-layer neural network, linear and polynomial SVMs; 19 and 6 reversal features | Not supported: 19 features lower AUC in every model (-0.011 to -0.024); six features give -0.010 to +0.002, every interval includes zero; the smallest permutation p is 0.03 (linear SVM, +0.002 AUC, uncorrected for six models) |
 | 13 | Does a wider sale condition (a sale from 9 months before the latest guidance) change the Stage 1 result? (`docs/STAGE13_SPEC.md`; registered in a parallel session, abrupt exit kept) | The Stage 1 tests on the new flag | Null: 145 flagged events, +3.4% a year (t = +0.79), placebo p 0.77 |
 | 14 | Do valuation and turnaround explain the flagged firms' returns? (exploratory; `docs/STAGE14_SPEC.md`) | Controls, matching, the announcement reaction | Valuation and turnaround do not account for the result (every flag coefficient is indistinguishable from zero, with or without controls); flagged firms are not cheap on earnings |
+| 15 | Do guide-sell-leave firms suffer large losses more often? (formerly numbered 10; registered 2026-11-04, so it ran before Stage 6; see `docs/LOSS_RATE_SPEC.md`) | Share of firms with a 12-month market-adjusted return below -30 points, flagged (480: guided, sold, left before the guidance came due) vs placebo groups and vs guided firms with no sale; threshold fixed before any outcome | Null, opposite sign: flagged 14.2% vs placebo 22.0% and vs no-sale 17.6% (-3.4 points, CI -7.7 to +0.8); smallest detectable difference 4.3 points |
 
-**Numbering and counts.** Stages were registered in parallel sessions, so two things share a number: *Stage 10* is both the large-loss test (`docs/LOSS_RATE_SPEC.md`) and the large-firm lead
-(`docs/STAGE10_SPEC.md`, called 10b above), and the two widenings of the flag are *Stage 13* (sale condition only, abrupt exit kept) and *Stage 1W* (no abruptness test, wider timing).
-Formal-test counts are kept in each spec and follow different sessions, so they do not add up to one project-wide number; the figures for the stages in the application supplement are in the specs.
-Stages 1W, 5W, 12b, 13 and 14 are exploratory: the definitions or models were chosen after seeing earlier results, and each spec says what had been seen before it was written.
+**Numbering and counts.** Stages were registered in parallel sessions. The large-loss test was first labelled 9, then 10, and is now **Stage 15** (`docs/LOSS_RATE_SPEC.md`),
+because number 10 belongs to the large-firm lead (`docs/STAGE10_SPEC.md`). The two widenings of the flag are *Stage 13* (the sale condition only, abrupt exit kept) and *Stage 1W*
+(no abruptness test, wider timing); the application supplement uses Stage 1W's flag throughout (Stages 1W, 5W, 12, 12b and 15). Formal-test counts are kept in each spec and follow
+different sessions, so they do not add up to one project-wide number. Stages 1W, 5W, 12b, 13 and 14 are exploratory: the definitions or models were chosen after seeing earlier
+results, and each spec says what had been seen before it was written.
 
 ## Repository map
 
@@ -163,7 +164,7 @@ docs/
   STAGE6_SPEC.md           Stage 6 design, fixed before any sale-level outcome was computed
   STAGE7_SPEC.md           Stage 7 design (exploratory re-analysis), fixed before any Stage 7 regression, with its results
   STAGE8_SPEC.md           Stage 8 design (opacity mechanism on all officers and directors), fixed before any Stage 8 outcome, with its results
-  LOSS_RATE_SPEC.md        Stage 10 (large-loss-rate test): the registered design, then its result
+  LOSS_RATE_SPEC.md        Stage 15 (large-loss-rate test; formerly numbered 10): the registered design, then its result
   STAGE9_SPEC.md           Stage 9 design (held-out confirmation on 2025 sales), fixed before any 2025 return, with its results
   STAGE10_SPEC.md          Stage 10 pre-registration (large-firm lead on unseen sales; not run, waiting for 2026 prices and sample size)
   STAGE14_SPEC.md          Stage 14 (do valuation and turnaround explain the flagged firms' returns?), registered before any outcome, with its results
@@ -201,7 +202,7 @@ src/                       all Python (flat; run scripts from the repo root)
   gg_stage11.py            Stage 11: higher criticism, Cauchy combination, Bayes factors, non-inferiority, regression calibration
   gg_stage12.py            Stage 12: market features, model constructors (boosting, logistic, XGBoost, neural network, SVMs), rolling windows, permutation test
   gg_extend.py             appends CRSP v2 returns after 2024-12-31 and the Fama-French market (the `--extend` runs)
-  gg_lossrate.py           Stage 10: share of firms with a large 12-month loss, flagged vs placebo groups and vs guided firms with no sale
+  gg_lossrate.py           Stage 15: share of firms with a large 12-month loss, flagged vs placebo groups and vs guided firms with no sale
   gg_crsp_ciz.py           CRSP v2 (CIZ) names and returns converted to the project layout; new name rows win; overlap check
 tests/
   test_gg.py               unit tests + simulations (planted-effect recovery, false-positive rate, power)
@@ -214,7 +215,7 @@ tests/
   test_gg10.py             Stage 10 machinery tests (gate, universe, samples, Holm, filings, refusal checks) and the chain script run against a fake uv
   test_gg14.py             Stage 14 tests (no look-ahead in valuation variables, matching, regression, successor proxy)
   test_gg11.py, test_gg12.py   Stage 11 and 12 tests (planted-effect checks for each method and model, leak-free window splits)
-  test_gg_lossrate.py      Stage 10 tests (flag logic, BHAR arithmetic, planted-effect placebo test, within-departure comparator)
+  test_gg_lossrate.py      Stage 15 tests (flag logic, BHAR arithmetic, planted-effect placebo test, within-departure comparator)
   test_gg_ciz.py           CRSP v2 conversion tests (columns, types, name-merge priority, overlap report)
 notebooks/
   guide_and_go_analysis.ipynb   results notebook (generated)

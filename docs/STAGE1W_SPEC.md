@@ -1,18 +1,18 @@
 # Stage 1W: the Stage 1 calendar-time test re-run on the widened flag (registered 2026-11-09, before any Stage 1W result was computed)
 
-**Status:** REGISTERED, **exploratory by construction.** The widened flag was adopted *after* the pre-registered strict flag (42 firms: guided within 180 days, sold after the latest guidance, abrupt exit) returned a null in Stage 1. What I had seen before writing this: the strict-flag Stage 1 result and its eight variants; the Stage 2 wider-definition results (all eight alphas between +0.2% and +2.8% a year); the Stage 10 large-loss results for this exact flag (14.2% against 17.6%); and Stages 11 and 12. **What I had not seen:** the calendar-time Carhart alpha for the widened flag. The supplement therefore presents this as the lead test but states that the flag definition was chosen after the strict version was null.
+**Status:** REGISTERED, **exploratory by construction.** The widened flag was adopted *after* the pre-registered strict flag (42 firms: guided within 180 days, sold after the latest guidance, abrupt exit) returned a null in Stage 1. What I had seen before writing this: the strict-flag Stage 1 result and its eight variants; the Stage 2 wider-definition results (all eight alphas between +0.2% and +2.8% a year); the Stage 15 large-loss results for this exact flag (14.2% against 17.6%); and Stages 11 and 12. **What I had not seen:** the calendar-time Carhart alpha for the widened flag. The supplement therefore presents this as the lead test but states that the flag definition was chosen after the strict version was null.
 
 ## 1. Why
 
 The strict flag needs three conditions at once (guidance in the 180 days before the announcement, a sale after the *latest* guidance, and an abrupt exit judged from announcement text). That gives 42 firms and little power, excludes the motivating case (Fiserv's CEO sold before the latest guidance), and depends on text labels that are noisy (the program's precision against hand labels is 59%). The widened flag keeps the hypothesis (guide, sell, leave before the guidance comes due) but needs no text classification and has about ten times the sample.
 
-## 2. The flag (fixed now; the Stage 10 definition, `gg_lossrate.flags`)
+## 2. The flag (fixed now; the Stage 15 definition, `gg_lossrate.flags`)
 
 A CEO or CFO departure announced 2004 to 2025 (announcement date identified, not a death) is flagged when **(i)** the firm issued at least one EPS guidance release in the 365 days before the announcement, **(ii)** the executive made an open-market sale after the first of those releases (Form 4, name matched), and **(iii)** at least one of those releases covers a period that ends after the announcement. No abruptness requirement. Comparison (placebo) pool: eligible departures that are not flagged.
 
 ## 3. The test (identical to Stage 1 except the flag)
 
-Hold each flagged firm from day +2 to +253 after the announcement (delisting returns applied); each day form the equal-weighted portfolio of firms held; regress its excess return on the market, size, value and momentum factors (weighted least squares, weights = number of firms held, Newey-West 10 lags); the intercept is the annualised alpha. **Primary:** one-sided (alpha below zero) placebo p-value from 2,000 random groups of non-flagged eligible departures with the same number per announcement year, seed 7. Windows with fewer than 20 observed days are dropped (Stage 10 used the same minimum).
+Hold each flagged firm from day +2 to +253 after the announcement (delisting returns applied); each day form the equal-weighted portfolio of firms held; regress its excess return on the market, size, value and momentum factors (weighted least squares, weights = number of firms held, Newey-West 10 lags); the intercept is the annualised alpha. **Primary:** one-sided (alpha below zero) placebo p-value from 2,000 random groups of non-flagged eligible departures with the same number per announcement year, seed 7. Windows with fewer than 20 observed days are dropped (Stage 15 used the same minimum).
 
 ## 4. Variants (eight, fixed now; Holm-adjusted together; 1,000 placebo draws each)
 
@@ -23,7 +23,7 @@ V1 CEOs only; V2 six-month hold; V3 six-factor model (adds profitability and inv
 - **Supported** only if the primary alpha is negative and the placebo p is below 0.05. Otherwise not supported, reported with the placebo 5th and 95th percentiles.
 - Because the flag was chosen after the strict-flag null, even a supported result would be exploratory and would need new data.
 - Reported whatever the sign. Also reported: the screening funnel (counts at each condition), and whether the Fiserv departure (announced 2025-05-07) is in the flagged sample and has a usable window.
-- Known limits fixed now: the flag windows use the first-identified announcement dates in `events.csv` (as in Stage 10, no leak guard); the Stage 1 caveat that the portfolio holds many firms at once, so overlapping windows make firm-level inference rest on the placebo; windows of firms announced late in 2025 are partial.
+- Known limits fixed now: the flag windows use the first-identified announcement dates in `events.csv` (as in Stage 15, no leak guard); the Stage 1 caveat that the portfolio holds many firms at once, so overlapping windows make firm-level inference rest on the placebo; windows of firms announced late in 2025 are partial.
 
 ## 5b. Amendment 1 (2026-11-09; after the 2004-2024 run below, before any extended-data result)
 
@@ -45,7 +45,7 @@ Run 2026-11-09 (`python scripts/run_stage1w.py --part primary` and `--part varia
 
 **The Fiserv check.** The Bisignano departure (announced 2025-05-07) is in the eligible sample and **is flagged** (five releases in the prior year, a $25.7M sale on 2024-09-20 after the first release of 2024-07-24, and three guided periods ending after the exit), but it has **no return window**: the CRSP cache ends on 2024-12-31, so every 2025 announcement is outside the return tests (flagged: 501; with returns: 480). Extending the return data through 2025 would add Fiserv's own post-announcement return and the other 2025 events.
 
-**Limits.** The flag was chosen after the strict-flag null, so this is exploratory; windows use the first-identified announcement dates (no leak guard, as in Stage 10); the portfolio holds about 22 firms at a time, so the placebo (not the t-statistic) is the inference; no 2025 events.
+**Limits.** The flag was chosen after the strict-flag null, so this is exploratory; windows use the first-identified announcement dates (no leak guard, as in Stage 15); the portfolio holds about 22 firms at a time, so the placebo (not the t-statistic) is the inference; no 2025 events.
 
 ### 6b. Extended-data results (Amendment 1; returns through 2025-12-31; `outputs/results/stage1w_ext_primary.json`, `stage1w_ext_variants.json`). These are the primary results.
 

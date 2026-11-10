@@ -1,6 +1,6 @@
 # Stage 12: does a model trained on the past predict the future? A rolling-window out-of-sample test (registered 2026-11-08, before any Stage 12 outcome was computed)
 
-**Numbering.** The held-out 2025 opacity confirmation is Stage 9, the large-loss-rate test is Stage 10 and the low-power methods are Stage 11 (`STAGE11_SPEC.md`); this is Stage 12.
+**Numbering.** The held-out 2025 opacity confirmation is Stage 9, the large-loss-rate test is Stage 15 (earlier numbered 10) and the low-power methods are Stage 11 (`STAGE11_SPEC.md`); this is Stage 12.
 
 **Status:** REGISTERED. What I looked at before writing it: how often the first-identified announcement date differs from the corrected one (98.4% equal; for 6% of flagged events the sale and guidance windows can extend past the corrected date), and the number of eligible events per year (140 to 212). No Stage 12 prediction, AUC or gap was computed. Exploratory: it reuses events from Stages 1 to 11.
 
@@ -41,7 +41,7 @@ For each test year t = 2010 to 2024: **train on announcement years t-6 to t-2** 
 
 **P12b (descriptive).** Rolling five-year windows of announcement years (2004-08, 2005-09, ..., 2020-24): in each, the large-loss share of flagged firms minus that of guided firms with outstanding guidance and no sale, the 3-day reaction gap to the first post-exit guidance, and the mean 12-month return gap, each with a bootstrap standard error over quarters. Reported in full, no window selected. A heterogeneity test (Cochran's Q) over the four non-overlapping blocks 2004-08, 2009-13, 2014-18, 2019-24.
 
-**Count.** P12a adds one formal test. With Stage 9 (held-out 2025), Stage 10 (large-loss) and Stage 11 (low-power methods) the project-wide count becomes **41**.
+**Count.** P12a adds one formal test. With Stage 9 (held-out 2025), Stage 15 (large-loss) and Stage 11 (low-power methods) the project-wide count becomes **41**.
 
 ## 8. Interpretation rules (fixed now)
 

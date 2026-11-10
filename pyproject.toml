@@ -25,6 +25,10 @@ notebook = [
     "nbconvert>=7.16",
     "ipykernel>=6.29",
 ]
+# Stage 12b (XGBoost model); the other Stage 12 models are in scikit-learn
+ml = [
+    "xgboost>=3.0",
+]
 # Stage 5 (segment-reporting transparency): 10-K parsing and fetching
 stage5 = [
     "beautifulsoup4>=4.12",

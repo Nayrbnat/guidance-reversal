@@ -1,0 +1,213 @@
+{
+ "spec": "docs/STAGE14_SPEC.md",
+ "coverage": {
+  "events": 5187,
+  "with_bhar": 4223,
+  "flag_old_with_bhar": 42,
+  "flag_new_with_bhar": 141,
+  "with_valuation_vars": 4215,
+  "flag_old_with_valuation": 42,
+  "flag_new_with_valuation": 141,
+  "funda_firm_years": 82865,
+  "events_with_book_equity": 5178,
+  "events_with_earnings": 5176
+ },
+ "flag_old": {
+  "A_announcement_car": {
+   "coef": -0.008403135830586772,
+   "se": 0.00980020758516491,
+   "p_two": 0.3935823837315151,
+   "n": 4633,
+   "clusters": 87,
+   "mean_flagged": -0.015346031144264966,
+   "mean_other": -0.006942895313678112,
+   "n_flagged": 42
+  },
+  "B_matched_size_ret": {
+   "diff": 0.009149045702134253,
+   "ci": [
+    -0.10123806708499207,
+    0.11483158420016375
+   ],
+   "n": 42,
+   "n_dropped": 0,
+   "k": 5
+  },
+  "B_matched_full": {
+   "diff": 0.05181936921288202,
+   "ci": [
+    -0.05202110266546684,
+    0.1582315776924284
+   ],
+   "n": 42,
+   "n_dropped": 0,
+   "k": 5
+  },
+  "C_i_full_sample": {
+   "coef": 0.00021970940880481916,
+   "se": 0.06777797480479146,
+   "p_two": 0.9974213566766355,
+   "n": 4223,
+   "clusters": 84
+  },
+  "C_i_same_sample": {
+   "coef": -4.963257514042105e-05,
+   "se": 0.06770167076802265,
+   "p_two": 0.9994168243795429,
+   "n": 4215,
+   "clusters": 84
+  },
+  "C_ii_size_ret": {
+   "coef": 0.011934781004571725,
+   "se": 0.06702696219170698,
+   "p_two": 0.8591101918099744,
+   "n": 4215,
+   "clusters": 84
+  },
+  "C_iii_full_controls": {
+   "coef": 0.010675676701715332,
+   "se": 0.06727570112068856,
+   "p_two": 0.8743021558193754,
+   "n": 4215,
+   "clusters": 84
+  },
+  "D_successor": {
+   "share_outside_flagged": 0.2619047619047619,
+   "n_flagged_ceo_with_successor": 42,
+   "share_outside_other": 0.16836182644449255,
+   "bhar_flagged_outside": -0.133655284575765,
+   "bhar_flagged_inside": 0.07839235318239766,
+   "n_outside_with_bhar": 11,
+   "n_inside_with_bhar": 30
+  },
+  "descriptives": {
+   "log_mcap": {
+    "flagged": 22.25645621821795,
+    "other": 21.468118079436046
+   },
+   "pre_ret_w": {
+    "flagged": -0.036619627458759386,
+    "other": -0.08147413564261763
+   },
+   "log_bm": {
+    "flagged": -1.1143800783235287,
+    "other": -0.7808743722636623
+   },
+   "ep_w": {
+    "flagged": 0.04072263842568782,
+    "other": -0.02765888365208867
+   },
+   "roa_w": {
+    "flagged": 0.046378995906060795,
+    "other": 0.02014742527556087
+   },
+   "neg_earn": {
+    "flagged": 0.19047619047619047,
+    "other": 0.23636363636363636
+   },
+   "bm_missing": {
+    "flagged": 0.0,
+    "other": 0.03587658454915092
+   }
+  }
+ },
+ "flag_new": {
+  "A_announcement_car": {
+   "coef": -0.011121058118334025,
+   "se": 0.0063665104055634,
+   "p_two": 0.08424119447244362,
+   "n": 4633,
+   "clusters": 87,
+   "mean_flagged": -0.01778967266784384,
+   "mean_other": -0.006668614549509727,
+   "n_flagged": 146
+  },
+  "B_matched_size_ret": {
+   "diff": 0.013223852973059566,
+   "ci": [
+    -0.057377378215142306,
+    0.09094334238651515
+   ],
+   "n": 141,
+   "n_dropped": 0,
+   "k": 5
+  },
+  "B_matched_full": {
+   "diff": 0.015000650248343655,
+   "ci": [
+    -0.058035118104134524,
+    0.09149356659898215
+   ],
+   "n": 139,
+   "n_dropped": 2,
+   "k": 5
+  },
+  "C_i_full_sample": {
+   "coef": 0.0035933145291254147,
+   "se": 0.041600425388502296,
+   "p_two": 0.9313748700628991,
+   "n": 4223,
+   "clusters": 84
+  },
+  "C_i_same_sample": {
+   "coef": 0.003345489743304931,
+   "se": 0.04151128232302546,
+   "p_two": 0.9359602019651654,
+   "n": 4215,
+   "clusters": 84
+  },
+  "C_ii_size_ret": {
+   "coef": 0.00796805180181919,
+   "se": 0.04140188942157874,
+   "p_two": 0.8478549611087259,
+   "n": 4215,
+   "clusters": 84
+  },
+  "C_iii_full_controls": {
+   "coef": 0.007925265892678892,
+   "se": 0.04144451201110591,
+   "p_two": 0.8488155871024776,
+   "n": 4215,
+   "clusters": 84
+  },
+  "D_successor": {
+   "share_outside_flagged": 0.16666666666666666,
+   "n_flagged_ceo_with_successor": 150,
+   "share_outside_other": 0.1692887214713051,
+   "bhar_flagged_outside": -0.04250653222734201,
+   "bhar_flagged_inside": 0.012174911717717054,
+   "n_outside_with_bhar": 23,
+   "n_inside_with_bhar": 115
+  },
+  "descriptives": {
+   "log_mcap": {
+    "flagged": 21.809830347048024,
+    "other": 21.464425960890125
+   },
+   "pre_ret_w": {
+    "flagged": -0.12269737123014067,
+    "other": -0.07958869576962334
+   },
+   "log_bm": {
+    "flagged": -0.8656133151660252,
+    "other": -0.7814409948395804
+   },
+   "ep_w": {
+    "flagged": 0.05167882446274684,
+    "other": -0.029696274712349674
+   },
+   "roa_w": {
+    "flagged": 0.054093788812750926,
+    "other": 0.019244531060353124
+   },
+   "neg_earn": {
+    "flagged": 0.14184397163120568,
+    "other": 0.2391570693457486
+   },
+   "bm_missing": {
+    "flagged": 0.014184397163120567,
+    "other": 0.036256736893679566
+   }
+  }
+ }
+}

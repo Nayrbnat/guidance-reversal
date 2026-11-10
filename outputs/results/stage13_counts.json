@@ -1,0 +1,50 @@
+{
+ "events": 5187,
+ "guided_recent": 2302,
+ "old_candidates": 289,
+ "new_candidates": 832,
+ "added_candidates": 543,
+ "old_flag_annotated": 45,
+ "old_flag_with_window": 42,
+ "new_candidates_abrupt_by_rule": 161,
+ "added_abrupt_by_rule": 114,
+ "added_abrupt_by_rule_with_window": 99,
+ "added_needing_annotation": 114,
+ "added_by_role": {
+  "CEO": 112,
+  "CFO": 2
+ },
+ "added_by_year": {
+  "2004": 4,
+  "2005": 7,
+  "2006": 11,
+  "2007": 10,
+  "2008": 4,
+  "2009": 1,
+  "2010": 3,
+  "2011": 8,
+  "2012": 4,
+  "2013": 6,
+  "2014": 8,
+  "2015": 3,
+  "2016": 3,
+  "2017": 6,
+  "2018": 2,
+  "2019": 9,
+  "2020": 3,
+  "2021": 2,
+  "2022": 4,
+  "2023": 5,
+  "2024": 3,
+  "2025": 8
+ },
+ "windows_available_events": 4223,
+ "last_event_with_window": "2024-03-14",
+ "fiserv": {
+  "old_candidate": 0,
+  "new_candidate": 1,
+  "new_rule_flag": 1,
+  "sell_val_win9": 25718035.88,
+  "has_window": false
+ }
+}

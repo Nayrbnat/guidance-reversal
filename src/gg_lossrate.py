@@ -119,6 +119,7 @@ def main():
     ap.add_argument("--reps", type=int, default=5000)
     ap.add_argument("--boot", type=int, default=2000)
     ap.add_argument("--labels", default="validation/candidate_labels.csv")
+    ap.add_argument("--extend", action="store_true", help="returns through 2025-12-31 (docs/LOSS_RATE_SPEC.md, Amendment 1)")
     a = ap.parse_args()
 
     ev = GV.load_eligible_events(a.start, a.end, a.labels)
@@ -129,6 +130,9 @@ def main():
 
     db = G.WRDS(refresh=False)
     crsp, mkt, _ = G.load_crsp(db, ev.permno.unique(), a.start, a.end)
+    if a.extend:
+        import gg_extend as EXT
+        crsp, mkt = EXT.extend_returns(db, crsp, mkt, ev.permno.unique())
     cal = np.sort(mkt.date.values.astype("datetime64[ns]"))
     mk = mkt.drop_duplicates("date").set_index("date").mkt.reindex(pd.DatetimeIndex(cal)).astype(float).values
 
@@ -148,7 +152,7 @@ def main():
            "within_departures": within_comparator(use, THRESHOLDS[0], a.boot),
            "within_departures_t20": within_comparator(use, THRESHOLDS[1], a.boot),
            "within_departures_t40": within_comparator(use, THRESHOLDS[2], a.boot)}
-    out = RESULTS / "lossrate_results.json"
+    out = RESULTS / ("lossrate_results_ext.json" if a.extend else "lossrate_results.json")
     out.write_text(json.dumps(res, indent=1), encoding="utf-8")
     p = res["primary"]
     print(f"PRIMARY (BHAR < -30 pts): flagged {p['n_loss_flagged']}/{p['n_flagged']} = {p['rate_flagged']:.1%} | "

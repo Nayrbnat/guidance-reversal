@@ -1,6 +1,6 @@
 # Large-loss-rate test (registered 2026-11-04, before any outcome was computed)
 
-**Numbering.** In the project's stage numbering this is **Stage 10**. It was registered and run on 2026-11-04 and first labelled Stage 9, before the held-out 2025 confirmation (`docs/STAGE9_SPEC.md`) took that number.
+**Numbering.** This test is **Stage 15**. It was registered and run on 2026-11-04 and first labelled Stage 9 (before the held-out 2025 confirmation, `docs/STAGE9_SPEC.md`, took that number), then Stage 10; 'Stage 10' now names the large-firm lead (`docs/STAGE10_SPEC.md`), so this test moved to the next free number. Results files and code keep the name `lossrate`.
 
 **Status:** REGISTERED. Written after Stages 1-5 and after counts of the sample (not outcomes) were seen; no loss rate has been computed. Exploratory follow-up to a null average effect.
 
@@ -47,3 +47,7 @@ Power: on the 480-event sample the test could detect a difference of about 4.3 p
 
 **Reading.** With about 11 times the events of Stage 1 and an outcome that targets the large-loss tail, the pattern still does not predict failure. The placebo comparison is flattered by selection, because firms that issue EPS guidance (all flagged firms do) are larger and steadier than the placebo pool, which includes non-guiders; the within-departure comparison removes that and still points the wrong way, so selling before leaving does not mark firms that later fail in this sample. Both agree with the Stage 3 and 4 reading that executive sales before an exit mark orderly departures.
 **Limits.** Market-adjusted, not risk-adjusted, returns. Sale and guidance windows end at the first-identified `dep_ann`, while return windows start from the annotator-corrected announcement date, so a few sales may fall after the corrected date. Windows overlap in calendar time and the placebo matches year counts only, not size or sector. The strict-flag sensitivity has 36, not 42, events because this sample requires an identified announcement and a window under the new rules. Project-wide test count: 37 after Stage 8 (see Rules).
+
+## Amendment 1 (2026-11-09): returns through 2025-12-31
+
+**Data only.** The legacy CRSP daily file and the market index in the main cache stop on 2024-12-31 on this account (WRDS has no 2026 CRSP rows). The CRSP v2 daily file (`gg_cache/ciz_dsf_2023_2025.pkl`, through 2025-12-31) is appended for later dates (`src/gg_extend.py`); the market return after 2024 is the Fama-French market (mktrf + rf), which over 2022 to 2024 correlates 0.998 with the cached CRSP index and runs about 1.4% a year higher. Nothing else changes: the flag, the 30-point threshold, the placebo (5,000 draws) and the within-departure comparison. 2025 announcements enter with partial windows (at least 20 observed days; the complete-window sensitivity needs 200). Run with `python src/gg_lossrate.py --extend`; results in `lossrate_results_ext.json`. The original (2004 to 2024 returns) results stay in this document. I knew those results when I made this change; the change is made because the 2025 returns exist, not because of any result.

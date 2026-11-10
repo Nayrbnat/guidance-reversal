@@ -1,0 +1,20 @@
+{
+ "spec": "docs/STAGE5W_SPEC.md",
+ "T1_widened": {
+  "nan_reason": "low: placebo pool 1422 is under 5x the 310 flagged events",
+  "groups": {
+   "low": {
+    "flagged": 310,
+    "pool": 1422
+   },
+   "high": {
+    "flagged": 172,
+    "pool": 1412
+   }
+  },
+  "fiserv": {
+   "flagged": 1,
+   "T": 2.0
+  }
+ }
+}

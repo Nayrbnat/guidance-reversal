@@ -1,0 +1,49 @@
+{
+ "spec": "docs/STAGE1W_SPEC.md",
+ "reps": 2000,
+ "funnel": {
+  "departures": 5163,
+  "eligible": 3650,
+  "guided_365d": 1855,
+  "sold_after_first": 660,
+  "flag": 501,
+  "flag_with_window": 492
+ },
+ "fiserv": {
+  "in_eligible": 1,
+  "flagged": 1,
+  "has_window": true
+ },
+ "primary": {
+  "alpha_ann": 0.025689233636662975,
+  "t": 1.6539865119009394,
+  "p": 0.09813025328582896,
+  "n_days": 5531,
+  "mean_pos": 22.01826071234858,
+  "betas": {
+   "mktrf": 0.9417930507568006,
+   "smb": 0.4612611805665671,
+   "hml": 0.021641231741669625,
+   "umd": -0.050475037999376526
+  },
+  "n_events": 492,
+  "placebo_p": 0.8040979510244878,
+  "placebo_mean": 0.008539612602653936,
+  "placebo_sd": 0.02095297945612467,
+  "placebo_q05": -0.02630471264985093,
+  "placebo_q95": 0.04277704920942917,
+  "reps": 2000,
+  "name": "PRIMARY: widened flag, 12m, four-factor"
+ },
+ "role_counts": {
+  "CEO": 489,
+  "CFO": 3
+ },
+ "sector_counts": {
+  "Tech": 135,
+  "Manufacturing": 97,
+  "Retail/Wholesale": 76,
+  "Other": 57,
+  "Transport/Utilities": 46
+ }
+}

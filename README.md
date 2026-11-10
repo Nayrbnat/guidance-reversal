@@ -145,6 +145,7 @@ docs/
   LOSS_RATE_SPEC.md        Stage 10 (large-loss-rate test): the registered design, then its result
   STAGE9_SPEC.md           Stage 9 design (held-out confirmation on 2025 sales), fixed before any 2025 return, with its results
   STAGE10_SPEC.md          Stage 10 pre-registration (large-firm lead on unseen sales; not run, waiting for 2026 prices and sample size)
+  STAGE14_SPEC.md          Stage 14 (do valuation and turnaround explain the flagged firms' returns?), registered before any outcome, with its results
   STAGE13_SPEC.md          Stage 13 (wider sale condition for the flag: a sale from 9 months before the latest guidance to the announcement), registered before any outcome
   MEMO_TEMPLATE.md         prose of MEMO.md with {{TABLE:name}} placeholders
   MEMO_chronological_2026-10-24.md   the earlier, stage-by-stage memo (kept for reference)
@@ -171,6 +172,7 @@ src/                       all Python (flat; run scripts from the repo root)
   gg_stage13.py            Stage 13: sale value in the wider window and the new flag columns (original columns never overwritten)
   gg_compustat_px.py       Compustat daily prices to returns (split-adjusted, total-return factor), one issue per CRSP security, CRSP splice, overlap validation
   gg_stage10.py            Stage 10 interim-run logic as tested functions: validation gate, universe restriction, per-test samples, Holm, filing chain, extension refusal checks
+  gg_stage14.py            Stage 14: valuation variables with a publication lag, matched comparison, clustered event regression, outside-successor proxy
   gg_lossrate.py           Stage 10: share of firms with a large 12-month loss, flagged vs placebo groups and vs guided firms with no sale
   gg_crsp_ciz.py           CRSP v2 (CIZ) names and returns converted to the project layout; new name rows win; overlap check
 tests/
@@ -182,6 +184,7 @@ tests/
   test_gg13.py             Stage 13 tests (window sums and boundaries, new flag columns, old flag untouched)
   test_gg_secd.py          Compustat price converter tests (splits, dividends, gaps, issue choice, splice)
   test_gg10.py             Stage 10 machinery tests (gate, universe, samples, Holm, filings, refusal checks) and the chain script run against a fake uv
+  test_gg14.py             Stage 14 tests (no look-ahead in valuation variables, matching, regression, successor proxy)
   test_gg_lossrate.py      Stage 10 tests (flag logic, BHAR arithmetic, planted-effect placebo test, within-departure comparator)
   test_gg_ciz.py           CRSP v2 conversion tests (columns, types, name-merge priority, overlap report)
 notebooks/
@@ -208,6 +211,8 @@ scripts/run_stage8.py      Stage 8: the mechanism test on all officers and direc
 scripts/pull_crsp_2025.py  Stage 9: pull CRSP v2 names and 2023-2025 returns and the factors through the REST API (new cache files only)
 scripts/phases_2025.py     Stage 9: extend phases to 2025 filings, refusing to write if any existing filing changes
 scripts/run_stage9.py      Stage 9: the held-out 2025 test (power first, one primary test) and the exploratory walk-forward
+scripts/pull_funda.py         Stage 14: stream Compustat annual fundamentals (the API ignores firm and column filters) into a new cache
+scripts/run_stage14.py        Stage 14: announcement reaction, matched comparison, event regression and successor split for the old and new flag
 scripts/count_stage13.py     Stage 13: counts only, how many events the wider sale condition adds (no returns)
 scripts/run_stage13.py       Stage 13: the Stage 1 tests rerun on the new flag (a flag-swapped copy of gg_study.py; S3 dropped)
 scripts/pull_insiders_2026.py, pull_compustat_px.py  Stage 10: stream the unfilterable insider and price tables into new caches (resumable)
